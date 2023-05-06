@@ -11,14 +11,14 @@ Motus is a command-line application written in Rust that makes generating secure
 
 Inspired by the user experience of the 1Password password generator, motus focuses on providing a simple and elegant user interface with sane defaults and comprehensive options. By default, motus copies the generated password to your clipboard, making it even more convenient to use.
 
-```console
-foo@bar:~$: motus memorable
+```zsh
+> motus memorable
 fossil abreast overplant commute dish
 
-foo@bar:~$: motus random
+> motus random
 UDrZrJJTYElWeOFHZmfp
 
-foo@bar:~$: motus pin
+> motus pin
 1234421
 ```
 
