@@ -12,6 +12,34 @@ Motus is a command-line application written in Rust that makes generating secure
 Inspired by the user experience of the 1Password password generator, motus focuses on providing a simple and elegant user interface with sane defaults and comprehensive options. By default, motus copies the generated password to your clipboard, making it even more convenient to use.
 
 ```zsh
+> motus --help
+Motus is a command-line tool for generating secure, random, and memorable passwords as well as PIN codes.
+
+Usage: motus [OPTIONS] <COMMAND>
+
+Commands:
+  memorable
+          Generate a human-friendly memorable password
+  random
+          Generate a random password with specified complexity
+  pin
+          Generate a random numeric PIN code
+  help
+          Print this message or the help of the given subcommand(s)
+
+Options:
+      --no-clipboard
+          Disable automatic copying of generated password to clipboard
+
+      --seed <SEED>
+          Seed value for deterministic password generation (for testing purposes)
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+
 > motus memorable
 fossil abreast overplant commute dish
 
@@ -28,13 +56,13 @@ UDrZrJJTYElWeOFHZmfp
 - Generate **secure memorable passwords**: motus uses the [EFF's wordlist](https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases) to generate secure and memorable passwords
 - Generate **random passwords** with optional number and symbol inclusion
 - Generate **PINs** with customizable length
-- Sane defaults
-- Flexible customization options
-- Clipboard integration for easy password usage
+- **Sane defaults**
+- Flexible **customization** options
+- **Clipboard** integration for easy password usage
 
 ## Installation
 
-### macOS
+### on macOS
 
 Using Homebrew:
 
@@ -43,7 +71,7 @@ brew tap oleiade/tap
 brew install motus
 ```
 
-### Debian/Ubuntu Linux
+### on Debian/Ubuntu Linux
 
 Add the repository and install motus:
 
@@ -64,7 +92,7 @@ apt update
 apt install motus
 ```
 
-### Cargo
+### using Cargo
 
 Alternatively, you can install using Cargo:
 
@@ -77,33 +105,33 @@ cargo install motus
 ### Generate a memorable password
 
 ```bash
-motus memorable
+> motus memorable
 fossil abreast overplant commute dish
 
 # Or customize the password generation
-motus memorable --words 7 --separator numbers-and-symbols --capitalize
+> motus memorable --words 7 --separator numbers-and-symbols --capitalize
 Goes$Stood3Paving(Tipoff$Settle*Flip3Scone
 ```
 
 ### Generate a random password
 
 ```bash
-motus random
+> motus random
 UDrZrJJTYElWeOFHZmfp
 
 # Or customize the password generation
-motus random --characters 42 --numbers --symbols
+> motus random --characters 42 --numbers --symbols
 6HdwMjKQPYE3scIBlCps&1Ir5R8lQ85eIVtF!fpUSD
 ```
 
 ### Generate a PIN
 
 ```bash
-motus pin
+> motus pin
 1234421
 
 # Or customize the size of the PIN
-motus pin --numbers 9
+> motus pin --numbers 9
 347751411
 ```
 
