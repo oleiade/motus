@@ -1,13 +1,26 @@
 <p align="center"><img src="logo.png" alt="motus logo"/></p>
 <h1 align="center">Dead simple password generator</h3>
 
-[![Release](https://img.shields.io/github/release/oleiade/motus.svg)](http://github.com/oleiade/motus/releases)
-[![AGPL License](https://img.shields.io/badge/license-AGPL-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
-[![Build Status](https://github.com/oleiade/motus/actions/workflows/build.yml/badge.svg)](https://github.com/oleiade/motus/actions/workflows/build.yml)
+<p align="center">
+    <a href="http://github.com/oleiade/motus/releases"><img src="https://img.shields.io/github/release/oleiade/motus.svg" alt="release"></a>
+    <a href="http://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/license-AGPL-blue.svg" alt="AGPL License"></a>
+    <a href="https://github.com/oleiade/motus/actions/workflows/build.yml"><img src="https://github.com/oleiade/motus/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
+</p>
 
 Motus is a command-line application written in Rust that makes generating secure passwords a breeze.
 
 Inspired by the user experience of the 1Password password generator, motus focuses on providing a simple and elegant user interface with sane defaults and comprehensive options. By default, motus copies the generated password to your clipboard, making it even more convenient to use.
+
+```console
+foo@bar:~$: motus memorable
+fossil abreast overplant commute dish
+
+foo@bar:~$: motus random
+UDrZrJJTYElWeOFHZmfp
+
+foo@bar:~$: motus pin
+1234421
+```
 
 ## Features
 
@@ -18,41 +31,6 @@ Inspired by the user experience of the 1Password password generator, motus focus
 - Sane defaults
 - Flexible customization options
 - Clipboard integration for easy password usage
-
-## Usage
-
-### Generate a memorable password
-
-```bash
-motus memorable
-fossil abreast overplant commute dish
-
-# Or customize the password generation
-motus memorable --words 7 --separator numbers-and-symbols --capitalize
-Goes$Stood3Paving(Tipoff$Settle*Flip3Scone
-```
-
-### Generate a random password
-
-```bash
-motus random
-UDrZrJJTYElWeOFHZmfp
-
-# Or customize the password generation
-motus random --characters 42 --numbers --symbols
-6HdwMjKQPYE3scIBlCps&1Ir5R8lQ85eIVtF!fpUSD
-```
-
-### Generate a PIN
-
-```bash
-motus pin
-1234421
-
-# Or customize the size of the PIN
-motus pin --numbers 9
-347751411
-```
 
 ## Installation
 
@@ -92,6 +70,41 @@ Alternatively, you can install using Cargo:
 
 ```bash
 cargo install motus
+```
+
+## Usage
+
+### Generate a memorable password
+
+```bash
+motus memorable
+fossil abreast overplant commute dish
+
+# Or customize the password generation
+motus memorable --words 7 --separator numbers-and-symbols --capitalize
+Goes$Stood3Paving(Tipoff$Settle*Flip3Scone
+```
+
+### Generate a random password
+
+```bash
+motus random
+UDrZrJJTYElWeOFHZmfp
+
+# Or customize the password generation
+motus random --characters 42 --numbers --symbols
+6HdwMjKQPYE3scIBlCps&1Ir5R8lQ85eIVtF!fpUSD
+```
+
+### Generate a PIN
+
+```bash
+motus pin
+1234421
+
+# Or customize the size of the PIN
+motus pin --numbers 9
+347751411
 ```
 
 ## Contributing
