@@ -1,0 +1,45 @@
+[package]
+name = "motus"
+version = "0.1.0"
+edition = "2021"
+authors = ["Théo Crevon <theo@crevon.me>"]
+description = "Access the most common information about your system using a single command"
+readme = "README.md"
+homepage = "https://github.com/oleiade/motus"
+repository = "https://github.com/oleiade/motus"
+keywords = ["cli", "security", "password", "generator"]
+categories = ["command-line-utilities"]
+license-file = "LICENSE"
+
+[profile.release]
+debug = true
+incremental = true
+lto = "off"
+
+[[bin]]
+name = "motus"
+path = "src/main.rs"
+
+[dependencies]
+arboard = "3.2.0"
+clap = { version = "4.2.5", features = ["derive"] }
+clap_complete = "4.2.1"
+human-panic = { default-features = false, version = "1.1.4" }
+lazy_static = "1.4.0"
+rand = "0.8.5"
+
+
+[package.metadata.deb]
+maintainer = "Théo Crevon <theo@crevon.me>"
+copyright = "2023, Théo Crevon <theo@crevon.me>"
+extended-description = """\
+Motus is a command-line application written in Rust that makes generating secure passwords a breeze.
+
+Inspired by the user experience of the 1Password password generator, motus focuses on providing a simple
+and elegant user interface with sane defaults and comprehensive options.
+
+By default, motus copies the generated password to your clipboard, making it even more convenient
+to use.
+"""
+section = "main"
+priority = "optional"
