@@ -337,16 +337,16 @@ mod tests {
         let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
 
         let password = memorable_password(&mut rng, 4, Separator::Space, false, false);
-        assert_eq!(password, "chairmen manacle discouraging metallurgy");
+        assert_eq!(password, "choking natural dolly ominous");
 
         let password = memorable_password(&mut rng, 4, Separator::Comma, false, false);
-        assert_eq!(password, "sweetheart,woad,headstock,vouchers");
+        assert_eq!(password, "thrive,punctured,wool,hardcover");
 
         let password = memorable_password(&mut rng, 4, Separator::Hyphen, true, false);
-        assert_eq!(password, "Anomic-Parallelepiped-Hiring-Forcefully");
+        assert_eq!(password, "Violate-Applause-Preorder-Headstone");
 
         let password = memorable_password(&mut rng, 4, Separator::Numbers, true, true);
-        assert_eq!(password, "Sveratoitre3Rgionitndoca4Erpitrs0Ipntanocet");
+        assert_eq!(password, "Nioutfna2Cerslua5Aborrcw4Wtpse");
     }
 
     #[test]
@@ -433,13 +433,7 @@ mod tests {
         // word list.
         assert_eq!(
             words,
-            vec![
-                "chairmen",
-                "mammy",
-                "discouraging",
-                "metallurgy",
-                "petticoats"
-            ]
+            vec!["chokehold", "nativity", "dolly", "ominous", "throat"]
         );
     }
 }
