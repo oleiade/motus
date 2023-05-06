@@ -12,34 +12,6 @@ Motus is a command-line application written in Rust that makes generating secure
 Inspired by the user experience of the 1Password password generator, motus focuses on providing a simple and elegant user interface with sane defaults and comprehensive options. By default, motus copies the generated password to your clipboard, making it even more convenient to use.
 
 ```zsh
-> motus --help
-Motus is a command-line tool for generating secure, random, and memorable passwords as well as PIN codes.
-
-Usage: motus [OPTIONS] <COMMAND>
-
-Commands:
-  memorable
-          Generate a human-friendly memorable password
-  random
-          Generate a random password with specified complexity
-  pin
-          Generate a random numeric PIN code
-  help
-          Print this message or the help of the given subcommand(s)
-
-Options:
-      --no-clipboard
-          Disable automatic copying of generated password to clipboard
-
-      --seed <SEED>
-          Seed value for deterministic password generation (for testing purposes)
-
-  -h, --help
-          Print help (see a summary with '-h')
-
-  -V, --version
-          Print version
-
 > motus memorable
 fossil abreast overplant commute dish
 
@@ -101,6 +73,36 @@ cargo install motus
 ```
 
 ## Usage
+
+```bash
+> motus --help
+Motus is a command-line tool for generating secure, random, and memorable passwords as well as PIN codes.
+
+Usage: motus [OPTIONS] <COMMAND>
+
+Commands:
+  memorable
+          Generate a human-friendly memorable password
+  random
+          Generate a random password with specified complexity
+  pin
+          Generate a random numeric PIN code
+  help
+          Print this message or the help of the given subcommand(s)
+
+Options:
+      --no-clipboard
+          Disable automatic copying of generated password to clipboard
+
+      --seed <SEED>
+          Seed value for deterministic password generation (for testing purposes)
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+```
 
 ### Generate a memorable password
 
