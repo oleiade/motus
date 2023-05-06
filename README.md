@@ -139,8 +139,12 @@ UDrZrJJTYElWeOFHZmfp
 
 ## Contributing
 
-We welcome contributions to the project. Feel free to submit issues, suggest new features, or create pull requests to help improve Motus.
+We welcome contributions to the project. Feel free to submit issues, suggest new features, or create pull requests to help improve motus.
 
 ## License
 
-This project is open-source and licensed under the MIT License.
+motus is distributed under the [AGPL-3.0 license](https://github.com/oleiade/motus/blob/master/LICENSE).
+
+## Why the name?
+
+motus used to be a tv game that I would call the ancestor of Wordle. Players had to guess words of a given size, and would pick up balls from a cup to decide how each round would move along. They would make that very distinct move to scramble the balls around every time, with a very distinct sound. When starting this project, I thought of the process of generating passwords as this comforting and satisfying act of diving into a huge cup full of numbered balls, and the childish feeling of it. This project is named in memory of Motus. 
