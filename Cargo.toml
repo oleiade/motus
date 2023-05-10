@@ -20,6 +20,10 @@ lto = "off"
 name = "motus"
 path = "src/main.rs"
 
+[lib]
+name = "motus"
+path = "src/lib.rs"
+
 [dependencies]
 arboard = "3.2.0"
 clap = { version = "4.2.5", features = ["derive"] }

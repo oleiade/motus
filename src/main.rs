@@ -1,15 +1,9 @@
 #![feature(iter_intersperse)]
 
-use std::sync::Arc;
-
-use clap::{Parser, Subcommand, ValueEnum};
-// use copypasta::{ClipboardContext, ClipboardProvider};
 use arboard::Clipboard;
+use clap::{Parser, Subcommand};
 use human_panic::setup_panic;
-use lazy_static::lazy_static;
-use rand::distributions::{Uniform, WeightedIndex};
 use rand::prelude::*;
-use rand::seq::SliceRandom;
 
 /// Args is a struct representing the command line arguments
 #[derive(Parser, Debug)]
@@ -46,7 +40,7 @@ enum Commands {
 
         /// Choose the separator for words in the generated password
         #[arg(short, long, default_value = "space", value_enum)]
-        separator: Separator,
+        separator: motus::Separator,
 
         /// Enable capitalization of each word in the generated password
         #[arg(short, long)]
@@ -88,32 +82,6 @@ enum Commands {
     },
 }
 
-/// Separator is an enum of possible separators for words in the password
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-enum Separator {
-    Space,
-    Comma,
-    Hyphen,
-    Period,
-    Underscore,
-    Numbers,
-    NumbersAndSymbols,
-}
-
-/// Include the word list file content as a static string
-const WORDS: &str = include_str!("../wordlist.txt");
-
-// Use lazy_static to create an indexed version of the list
-lazy_static! {
-    static ref WORDS_LIST: Arc<Vec<&'static str>> = {
-        let words = WORDS
-            .lines()
-            .filter(|l| l.len() >= 4)
-            .collect::<Vec<&str>>();
-        Arc::new(words)
-    };
-}
-
 fn main() {
     // Enable human-readable panic messages
     setup_panic!();
@@ -135,7 +103,7 @@ fn main() {
             separator,
             capitalize,
             no_full_words,
-        } => memorable_password(
+        } => motus::memorable_password(
             &mut rng,
             words as usize,
             separator,
@@ -146,8 +114,8 @@ fn main() {
             characters,
             numbers,
             symbols,
-        } => random_password(&mut rng, characters, numbers, symbols),
-        Commands::Pin { numbers } => pin_password(&mut rng, numbers),
+        } => motus::random_password(&mut rng, characters, numbers, symbols),
+        Commands::Pin { numbers } => motus::pin_password(&mut rng, numbers),
     };
 
     // Copy the password to the clipboard
@@ -161,136 +129,6 @@ fn main() {
 
     print!("{}", password);
 }
-
-/// memorable_password generates a password with the given number of words, separated by the given
-/// separator.
-///
-/// If capitalize is true, each word will be capitalized.
-/// If scramble is true, the words will be scrambled before being joined.
-fn memorable_password<R: Rng>(
-    rng: &mut R,
-    word_count: usize,
-    separator: Separator,
-    capitalize: bool,
-    scramble: bool,
-) -> String {
-    // Get the random words and format them
-    let formatted_words: Vec<String> = get_random_words(rng, word_count)
-        .iter()
-        .map(|word| {
-            let mut word = word.to_string();
-
-            // Scramble the word if requested
-            if scramble {
-                let mut bytes = word.to_string().into_bytes();
-                bytes.shuffle(rng);
-                word =
-                    String::from_utf8(bytes.to_vec()).expect("random words should be valid UTF-8");
-            }
-
-            // Capitalize the word if requested
-            if capitalize {
-                if let Some(first_letter) = word.get_mut(0..1) {
-                    first_letter.make_ascii_uppercase();
-                }
-            }
-            word
-        })
-        .collect();
-
-    // Join the formatted words with the separator
-    match separator {
-        Separator::Space => formatted_words.join(" "),
-        Separator::Comma => formatted_words.join(","),
-        Separator::Hyphen => formatted_words.join("-"),
-        Separator::Period => formatted_words.join("."),
-        Separator::Underscore => formatted_words.join("_"),
-        Separator::Numbers => formatted_words
-            .iter()
-            .map(|s| s.to_string())
-            .intersperse_with(|| rng.gen_range(0..10).to_string())
-            .collect(),
-        Separator::NumbersAndSymbols => {
-            let numbers_and_symbols: Vec<char> = SYMBOL_CHARS
-                .iter()
-                .chain(NUMBER_CHARS.iter())
-                .cloned()
-                .collect();
-            formatted_words
-                .iter()
-                .map(|s| s.to_string())
-                .intersperse_with(|| {
-                    numbers_and_symbols
-                        .choose(rng)
-                        .expect("numbers and symbols should have a length >= 1")
-                        .to_string()
-                })
-                .collect()
-        }
-    }
-}
-
-/// random_password generates a password with the given number of characters, using the given
-/// character sets.
-fn random_password<R: Rng>(rng: &mut R, characters: u32, numbers: bool, symbols: bool) -> String {
-    let mut available_sets = vec![LETTER_CHARS];
-
-    if numbers {
-        available_sets.push(NUMBER_CHARS);
-    }
-
-    if symbols {
-        available_sets.push(SYMBOL_CHARS);
-    }
-
-    let weights: Vec<u32> = match (numbers, symbols) {
-        // If numbers and symbols are both true, we want to make sure that
-        // we apply the following distribution: 70% letters, 20% numbers, 10% symbols.
-        (true, true) => vec![7, 2, 1],
-
-        // If either numbers or symbols is true, but not the other, we want
-        // to make sure that we apply the following distribution: 80% letters, 20% numbers.
-        (true, false) => vec![8, 2],
-        (false, true) => vec![8, 2],
-
-        // Otherwise we want to make sure that we apply the following distribution: 100% letters.
-        (false, false) => vec![10],
-    };
-
-    let dist_set = WeightedIndex::new(&weights).expect("weights should be valid");
-    let mut password = String::with_capacity(characters as usize);
-
-    for _ in 0..characters {
-        let selected_set = available_sets
-            .get(dist_set.sample(rng))
-            .expect("index should be valid");
-        let dist_char = Uniform::from(0..selected_set.len());
-        let index = dist_char.sample(rng);
-        password.push(selected_set[index]);
-    }
-
-    password
-}
-
-/// pin_password generates a PIN with the given number of numbers.
-fn pin_password<R: Rng>(rng: &mut R, numbers: u32) -> String {
-    (0..numbers)
-        .map(|_| NUMBER_CHARS[rng.gen_range(0..NUMBER_CHARS.len())])
-        .collect()
-}
-
-/// LETTER_CHARS is a list of letters that can be used in passwords
-const LETTER_CHARS: &[char] = &[
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-    't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-];
-
-/// NUMBER_CHARS is a list of numbers that can be used in passwords
-const NUMBER_CHARS: &[char] = &['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-
-/// SYMBOL_CHARS is a list of symbols that can be used in passwords
-const SYMBOL_CHARS: &[char] = &['!', '@', '#', '$', '%', '^', '&', '*', '(', ')'];
 
 /// validate_word_count parses the given string as a u32 and returns an error if it is not between
 /// 3 and 15.
@@ -322,96 +160,9 @@ fn validate_pin_length(s: &str) -> Result<u32, String> {
     }
 }
 
-/// get_random_words returns a vector of n random words from the word list
-fn get_random_words<R: Rng>(rng: &mut R, n: usize) -> Vec<&'static str> {
-    WORDS_LIST.choose_multiple(rng, n).cloned().collect()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_memorable_password() {
-        let seed = 42; // Fixed seed for predictable randomness
-        let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
-
-        let password = memorable_password(&mut rng, 4, Separator::Space, false, false);
-        assert_eq!(password, "choking natural dolly ominous");
-
-        let password = memorable_password(&mut rng, 4, Separator::Comma, false, false);
-        assert_eq!(password, "thrive,punctured,wool,hardcover");
-
-        let password = memorable_password(&mut rng, 4, Separator::Hyphen, true, false);
-        assert_eq!(password, "Violate-Applause-Preorder-Headstone");
-
-        let password = memorable_password(&mut rng, 4, Separator::Numbers, true, true);
-        assert_eq!(password, "Nioutfna2Cerslua5Aborrcw4Wtpse");
-    }
-
-    #[test]
-    fn test_random_password_length() {
-        let mut rng = StdRng::seed_from_u64(0);
-        let length = 12;
-        let password = random_password(&mut rng, length, true, true);
-        assert_eq!(password.len(), length as usize);
-    }
-
-    #[test]
-    fn test_random_password_content() {
-        let mut rng = StdRng::seed_from_u64(0);
-        let length = 12;
-
-        let password_letters = random_password(&mut rng, length, false, false);
-        assert!(password_letters.chars().all(|c| LETTER_CHARS.contains(&c)));
-
-        let password_numbers = random_password(&mut rng, length, true, false);
-        assert!(password_numbers.chars().any(|c| NUMBER_CHARS.contains(&c)));
-
-        let password_symbols = random_password(&mut rng, length, false, true);
-        assert!(password_symbols.chars().any(|c| SYMBOL_CHARS.contains(&c)));
-
-        let password_numbers_symbols = random_password(&mut rng, length, true, true);
-        assert!(password_numbers_symbols
-            .chars()
-            .any(|c| NUMBER_CHARS.contains(&c) || SYMBOL_CHARS.contains(&c)));
-    }
-
-    #[test]
-    fn test_random_password_different_seeds() {
-        let mut rng1 = StdRng::seed_from_u64(0);
-        let mut rng2 = StdRng::seed_from_u64(1);
-        let length = 12;
-        let password1 = random_password(&mut rng1, length, true, true);
-        let password2 = random_password(&mut rng2, length, true, true);
-        assert_ne!(password1, password2);
-    }
-
-    #[test]
-    fn test_pin_password_length() {
-        let mut rng = StdRng::seed_from_u64(0);
-        let pin_length = 6;
-        let pin = pin_password(&mut rng, pin_length);
-        assert_eq!(pin.len(), pin_length as usize);
-    }
-
-    #[test]
-    fn test_pin_password_content() {
-        let mut rng = StdRng::seed_from_u64(0);
-        let pin_length = 6;
-        let pin = pin_password(&mut rng, pin_length);
-        assert!(pin.chars().all(|c| NUMBER_CHARS.contains(&c)));
-    }
-
-    #[test]
-    fn test_pin_password_different_seeds() {
-        let mut rng1 = StdRng::seed_from_u64(0);
-        let mut rng2 = StdRng::seed_from_u64(1);
-        let pin_length = 6;
-        let pin1 = pin_password(&mut rng1, pin_length);
-        let pin2 = pin_password(&mut rng2, pin_length);
-        assert_ne!(pin1, pin2);
-    }
 
     #[test]
     fn test_validate_word_count() {
@@ -422,18 +173,18 @@ mod tests {
     }
 
     #[test]
-    fn test_get_random_words() {
-        let seed = 42; // Fixed seed for predictable randomness
-        let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    fn test_validate_character_count() {
+        assert!(validate_character_count("7").is_err());
+        assert!(validate_character_count("8").is_ok());
+        assert!(validate_character_count("100").is_ok());
+        assert!(validate_character_count("101").is_err());
+    }
 
-        let words = get_random_words(&mut rng, 5);
-
-        // Note that the expected word list is fixed as we provide a fixed
-        // random seed. If you change the seed, you should change the expected
-        // word list.
-        assert_eq!(
-            words,
-            vec!["chokehold", "nativity", "dolly", "ominous", "throat"]
-        );
+    #[test]
+    fn test_validate_pin_length() {
+        assert!(validate_pin_length("2").is_err());
+        assert!(validate_pin_length("3").is_ok());
+        assert!(validate_pin_length("12").is_ok());
+        assert!(validate_pin_length("13").is_err());
     }
 }
