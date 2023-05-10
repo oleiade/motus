@@ -1,9 +1,13 @@
 #![feature(iter_intersperse)]
 
+use std::fmt::{Display, Formatter};
+
 use arboard::Clipboard;
 use clap::{Parser, Subcommand};
+use colored::Colorize;
 use human_panic::setup_panic;
 use rand::prelude::*;
+use zxcvbn::zxcvbn;
 
 /// Args is a struct representing the command line arguments
 #[derive(Parser, Debug)]
@@ -20,6 +24,9 @@ struct Cli {
     /// Disable automatic copying of generated password to clipboard
     #[arg(long)]
     no_clipboard: bool,
+
+    #[arg(long)]
+    analyze: bool,
 
     /// Seed value for deterministic password generation (for testing purposes)
     #[arg(long)]
@@ -127,7 +134,65 @@ fn main() {
             .expect("unable to set clipboard contents");
     }
 
-    print!("{}", password);
+    println!("{}", password);
+
+    // When the --analyze flag is set, print a safety analysis of the generated password
+    if opts.analyze {
+        println!();
+
+        let analysis = zxcvbn(&password, &[]).expect("unable to analyze password's safety");
+        println!("{}", SecurityAnalysis { entropy: &analysis });
+    }
+}
+
+struct SecurityAnalysis<'a> {
+    entropy: &'a zxcvbn::Entropy,
+}
+
+impl<'a> Display for SecurityAnalysis<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let strength = match self.entropy.score() {
+            0 => "very weak".red(),
+            1 => "weak".bright_red(),
+            2 => "reasonable".yellow(),
+            3 => "strong".bright_green(),
+            4 => "very strong".green(),
+            _ => "unknown".normal(),
+        };
+
+        writeln!(f, "safety analysis:")?;
+        writeln!(f, "  strength: {}", strength)?;
+        writeln!(f, "  guesses: 10^{:.0}", self.entropy.guesses_log10())?;
+        writeln!(f, "  crack times:")?;
+        writeln!(
+            f,
+            "    100/h: {}",
+            self.entropy.crack_times().online_throttling_100_per_hour()
+        )?;
+        writeln!(
+            f,
+            "    10/s: {}",
+            self.entropy
+                .crack_times()
+                .online_no_throttling_10_per_second()
+        )?;
+        writeln!(
+            f,
+            "    10^4/s: {}",
+            self.entropy
+                .crack_times()
+                .offline_slow_hashing_1e4_per_second()
+        )?;
+        writeln!(
+            f,
+            "    10^10/s: {}",
+            self.entropy
+                .crack_times()
+                .offline_fast_hashing_1e10_per_second()
+        )?;
+
+        Ok(())
+    }
 }
 
 /// validate_word_count parses the given string as a u32 and returns an error if it is not between
