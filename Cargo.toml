@@ -34,6 +34,9 @@ lazy_static = "1.4.0"
 rand = "0.8.5"
 zxcvbn = "2.2.2"
 
+[dev-dependencies]
+assert_cmd = "2.0.11"
+
 
 [package.metadata.deb]
 maintainer = "Théo Crevon <theo@crevon.me>"
