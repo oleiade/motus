@@ -40,7 +40,7 @@ lazy_static! {
 ///
 /// ```
 /// use rand::thread_rng;
-/// use my_password_generator::{Separator, memorable_password};
+/// use motus::{Separator, memorable_password};
 ///
 /// let rng = &mut thread_rng();
 /// let word_count = 3;
@@ -164,7 +164,7 @@ pub enum Separator {
 ///
 /// ```
 /// use rand::thread_rng;
-/// use password_generator::random_password;
+/// use motus::random_password;
 ///
 /// let mut rng = thread_rng();
 /// let password = random_password(&mut rng, 12, true, true);
@@ -232,7 +232,7 @@ pub fn random_password<R: Rng>(
 ///
 /// ```
 /// use rand::thread_rng;
-/// use password_generator::pin_password;
+/// use motus::pin_password;
 ///
 /// let mut rng = thread_rng();
 /// let pin = pin_password(&mut rng, 4);
