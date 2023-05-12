@@ -1,12 +1,15 @@
 #![feature(iter_intersperse)]
 
+use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 
 use arboard::Clipboard;
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use colored::Colorize;
 use human_panic::setup_panic;
 use rand::prelude::*;
+use serde::ser::{SerializeStruct, Serializer};
+use serde::Serialize;
 use term_table::row::Row;
 use term_table::table_cell::{Alignment, TableCell};
 use term_table::{Table, TableStyle};
@@ -27,6 +30,10 @@ struct Cli {
     /// Disable automatic copying of generated password to clipboard
     #[arg(long)]
     no_clipboard: bool,
+
+    /// Output the generated password in a specified format
+    #[arg(short, long, default_value = "text", value_enum)]
+    output: OutputFormat,
 
     /// Display a safety analysis along the generated password
     #[arg(long)]
@@ -138,20 +145,119 @@ fn main() {
             .expect("unable to set clipboard contents");
     }
 
-    // When the --analyze flag is set, print a safety analysis of the generated password
-    if opts.analyze {
-        println!();
+    match opts.output {
+        OutputFormat::Text => {
+            if opts.analyze {
+                let analysis = SecurityAnalysis::new(&password);
+                analysis.display_report(TableStyle::extended(), 80)
+            } else {
+                println!("{}", password);
+            }
+        }
+        OutputFormat::Json => {
+            let output = PasswordOutput {
+                kind: match opts.command {
+                    Commands::Memorable { .. } => PasswordKind::Memorable,
+                    Commands::Random { .. } => PasswordKind::Random,
+                    Commands::Pin { .. } => PasswordKind::Pin,
+                },
+                password: &password,
+                analysis: if opts.analyze {
+                    Some(SecurityAnalysis::new(&password))
+                } else {
+                    None
+                },
+            };
+            println!("{}", serde_json::to_string(&output).unwrap());
+        }
+    }
+}
 
-        let analysis = SecurityAnalysis::new(&password);
-        analysis.display_report(TableStyle::extended(), 80);
-    } else {
-        println!("{}", password);
+#[derive(ValueEnum, Clone, Debug)]
+enum OutputFormat {
+    Text,
+    Json,
+}
+
+#[derive(Serialize)]
+struct PasswordOutput<'a> {
+    kind: PasswordKind,
+    password: &'a str,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    analysis: Option<SecurityAnalysis<'a>>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "lowercase")]
+enum PasswordKind {
+    Memorable,
+    Random,
+    Pin,
+}
+
+impl Display for PasswordKind {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PasswordKind::Memorable => write!(f, "memorable"),
+            PasswordKind::Random => write!(f, "random"),
+            PasswordKind::Pin => write!(f, "pin"),
+        }
     }
 }
 
 struct SecurityAnalysis<'a> {
     password: &'a str,
     entropy: zxcvbn::Entropy,
+}
+
+impl Serialize for SecurityAnalysis<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut crack_times = HashMap::new();
+        crack_times.insert(
+            "100/h",
+            self.entropy
+                .crack_times()
+                .online_throttling_100_per_hour()
+                .to_string(),
+        );
+
+        crack_times.insert(
+            "10/s",
+            self.entropy
+                .crack_times()
+                .online_no_throttling_10_per_second()
+                .to_string(),
+        );
+
+        crack_times.insert(
+            "10^4/s",
+            self.entropy
+                .crack_times()
+                .offline_slow_hashing_1e4_per_second()
+                .to_string(),
+        );
+
+        crack_times.insert(
+            "10^10/s",
+            self.entropy
+                .crack_times()
+                .offline_fast_hashing_1e10_per_second()
+                .to_string(),
+        );
+
+        let mut struct_serializer = serializer.serialize_struct("SecurityAnalysis", 3)?;
+        struct_serializer.serialize_field(
+            "strength",
+            &PasswordStrength::from(self.entropy.score()).to_string(),
+        )?;
+        struct_serializer.serialize_field("guesses", &self.entropy.guesses_log10())?;
+        struct_serializer.serialize_field("crack_times", &crack_times)?;
+        struct_serializer.end()
+    }
 }
 
 impl<'a> SecurityAnalysis<'a> {
