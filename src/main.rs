@@ -5,7 +5,7 @@ use std::fmt::{Display, Formatter};
 
 use arboard::Clipboard;
 use clap::{Parser, Subcommand, ValueEnum};
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 use human_panic::setup_panic;
 use rand::prelude::*;
 use serde::ser::{SerializeStruct, Serializer};
@@ -254,7 +254,10 @@ impl Serialize for SecurityAnalysis<'_> {
             "strength",
             &PasswordStrength::from(self.entropy.score()).to_string(),
         )?;
-        struct_serializer.serialize_field("guesses", &self.entropy.guesses_log10())?;
+        struct_serializer.serialize_field(
+            "guesses",
+            format!("10^{:.0}", &self.entropy.guesses_log10()).as_str(),
+        )?;
         struct_serializer.serialize_field("crack_times", &crack_times)?;
         struct_serializer.end()
     }
@@ -302,7 +305,7 @@ impl<'a> SecurityAnalysis<'a> {
         table.add_row(Row::new(vec![
             TableCell::new("Strength".bold()),
             TableCell::new_with_alignment(
-                PasswordStrength::from(self.entropy.score()).to_string(),
+                PasswordStrength::from(self.entropy.score()).to_colored_string(),
                 1,
                 Alignment::Left,
             ),
@@ -410,14 +413,26 @@ impl From<u8> for PasswordStrength {
     }
 }
 
+impl PasswordStrength {
+    fn to_colored_string(&self) -> ColoredString {
+        match self {
+            PasswordStrength::VeryWeak => self.to_string().red(),
+            PasswordStrength::Weak => self.to_string().bright_red(),
+            PasswordStrength::Reasonable => self.to_string().yellow(),
+            PasswordStrength::Strong => self.to_string().bright_green(),
+            PasswordStrength::VeryStrong => self.to_string().green(),
+        }
+    }
+}
+
 impl Display for PasswordStrength {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let strength = match self {
-            PasswordStrength::VeryWeak => "very weak".red(),
-            PasswordStrength::Weak => "weak".bright_red(),
-            PasswordStrength::Reasonable => "reasonable".yellow(),
-            PasswordStrength::Strong => "strong".bright_green(),
-            PasswordStrength::VeryStrong => "very strong".green(),
+            PasswordStrength::VeryWeak => "very weak",
+            PasswordStrength::Weak => "weak",
+            PasswordStrength::Reasonable => "reasonable",
+            PasswordStrength::Strong => "strong",
+            PasswordStrength::VeryStrong => "very strong",
         };
 
         write!(f, "{}", strength)
