@@ -7,6 +7,9 @@ use clap::{Parser, Subcommand};
 use colored::Colorize;
 use human_panic::setup_panic;
 use rand::prelude::*;
+use term_table::row::Row;
+use term_table::table_cell::{Alignment, TableCell};
+use term_table::{Table, TableStyle};
 use zxcvbn::zxcvbn;
 
 /// Args is a struct representing the command line arguments
@@ -25,6 +28,7 @@ struct Cli {
     #[arg(long)]
     no_clipboard: bool,
 
+    /// Display a safety analysis along the generated password
     #[arg(long)]
     analyze: bool,
 
@@ -134,64 +138,183 @@ fn main() {
             .expect("unable to set clipboard contents");
     }
 
-    println!("{}", password);
-
     // When the --analyze flag is set, print a safety analysis of the generated password
     if opts.analyze {
         println!();
 
-        let analysis = zxcvbn(&password, &[]).expect("unable to analyze password's safety");
-        println!("{}", SecurityAnalysis { entropy: &analysis });
+        let analysis = SecurityAnalysis::new(&password);
+        analysis.display_report(TableStyle::extended(), 80);
+    } else {
+        println!("{}", password);
     }
 }
 
 struct SecurityAnalysis<'a> {
-    entropy: &'a zxcvbn::Entropy,
+    password: &'a str,
+    entropy: zxcvbn::Entropy,
 }
 
-impl<'a> Display for SecurityAnalysis<'a> {
+impl<'a> SecurityAnalysis<'a> {
+    fn new(password: &'a str) -> Self {
+        let entropy = zxcvbn(password, &[]).expect("unable to analyze password's safety");
+        Self { password, entropy }
+    }
+
+    fn display_report(&self, table_style: TableStyle, max_width: usize) {
+        self.display_password_table(table_style, max_width);
+        self.display_analysis_table(table_style, max_width);
+        self.display_crack_times_table(table_style, max_width);
+    }
+
+    fn display_password_table(&self, table_style: TableStyle, max_width: usize) {
+        let mut table = Table::new();
+        table.max_column_width = max_width;
+        table.style = table_style;
+
+        table.add_row(Row::new(vec![TableCell::new_with_alignment(
+            "Generated Password".bold(),
+            1,
+            Alignment::Left,
+        )]));
+
+        table.add_row(Row::new(vec![TableCell::new(self.password)]));
+
+        println!("{}", table.render());
+    }
+
+    fn display_analysis_table(&self, table_style: TableStyle, max_width: usize) {
+        let mut table = Table::new();
+        table.max_column_width = max_width;
+        table.style = table_style;
+
+        table.add_row(Row::new(vec![TableCell::new_with_alignment(
+            "Security Analysis",
+            2,
+            Alignment::Left,
+        )]));
+
+        table.add_row(Row::new(vec![
+            TableCell::new("Strength".bold()),
+            TableCell::new_with_alignment(
+                PasswordStrength::from(self.entropy.score()).to_string(),
+                1,
+                Alignment::Left,
+            ),
+        ]));
+
+        table.add_row(Row::new(vec![
+            TableCell::new("Guesses".bold()),
+            TableCell::new_with_alignment(
+                format!("10^{:.0}", self.entropy.guesses_log10()),
+                1,
+                Alignment::Left,
+            ),
+        ]));
+
+        println!("{}", table.render());
+    }
+
+    fn display_crack_times_table(&self, table_style: TableStyle, max_width: usize) {
+        let mut table = Table::new();
+        table.max_column_width = max_width;
+        table.style = table_style;
+
+        table.add_row(Row::new(vec![TableCell::new_with_alignment(
+            "Crack time estimations",
+            2,
+            Alignment::Left,
+        )]));
+
+        table.add_row(Row::new(vec![
+            TableCell::new("100 attempts/hour".bold()),
+            TableCell::new_with_alignment(
+                format!(
+                    "{}",
+                    self.entropy.crack_times().online_throttling_100_per_hour()
+                ),
+                1,
+                Alignment::Left,
+            ),
+        ]));
+
+        table.add_row(Row::new(vec![
+            TableCell::new("10 attempts/second".bold()),
+            TableCell::new_with_alignment(
+                format!(
+                    "{}",
+                    self.entropy
+                        .crack_times()
+                        .online_no_throttling_10_per_second()
+                ),
+                1,
+                Alignment::Left,
+            ),
+        ]));
+
+        table.add_row(Row::new(vec![
+            TableCell::new("10^4 attempts/second".bold()),
+            TableCell::new_with_alignment(
+                format!(
+                    "{}",
+                    self.entropy
+                        .crack_times()
+                        .offline_slow_hashing_1e4_per_second()
+                ),
+                1,
+                Alignment::Left,
+            ),
+        ]));
+
+        table.add_row(Row::new(vec![
+            TableCell::new("10^10 attempts/second".bold()),
+            TableCell::new_with_alignment(
+                format!(
+                    "{}",
+                    self.entropy
+                        .crack_times()
+                        .offline_fast_hashing_1e10_per_second()
+                ),
+                1,
+                Alignment::Left,
+            ),
+        ]));
+
+        println!("{}", table.render());
+    }
+}
+
+enum PasswordStrength {
+    VeryWeak,
+    Weak,
+    Reasonable,
+    Strong,
+    VeryStrong,
+}
+
+impl From<u8> for PasswordStrength {
+    fn from(score: u8) -> Self {
+        match score {
+            0 => PasswordStrength::VeryWeak,
+            1 => PasswordStrength::Weak,
+            2 => PasswordStrength::Reasonable,
+            3 => PasswordStrength::Strong,
+            4 => PasswordStrength::VeryStrong,
+            _ => panic!("invalid score"),
+        }
+    }
+}
+
+impl Display for PasswordStrength {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let strength = match self.entropy.score() {
-            0 => "very weak".red(),
-            1 => "weak".bright_red(),
-            2 => "reasonable".yellow(),
-            3 => "strong".bright_green(),
-            4 => "very strong".green(),
-            _ => "unknown".normal(),
+        let strength = match self {
+            PasswordStrength::VeryWeak => "very weak".red(),
+            PasswordStrength::Weak => "weak".bright_red(),
+            PasswordStrength::Reasonable => "reasonable".yellow(),
+            PasswordStrength::Strong => "strong".bright_green(),
+            PasswordStrength::VeryStrong => "very strong".green(),
         };
 
-        writeln!(f, "safety analysis:")?;
-        writeln!(f, "  strength: {}", strength)?;
-        writeln!(f, "  guesses: 10^{:.0}", self.entropy.guesses_log10())?;
-        writeln!(f, "  crack times:")?;
-        writeln!(
-            f,
-            "    100/h: {}",
-            self.entropy.crack_times().online_throttling_100_per_hour()
-        )?;
-        writeln!(
-            f,
-            "    10/s: {}",
-            self.entropy
-                .crack_times()
-                .online_no_throttling_10_per_second()
-        )?;
-        writeln!(
-            f,
-            "    10^4/s: {}",
-            self.entropy
-                .crack_times()
-                .offline_slow_hashing_1e4_per_second()
-        )?;
-        writeln!(
-            f,
-            "    10^10/s: {}",
-            self.entropy
-                .crack_times()
-                .offline_fast_hashing_1e10_per_second()
-        )?;
-
-        Ok(())
+        write!(f, "{}", strength)
     }
 }
 
