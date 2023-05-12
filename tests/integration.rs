@@ -142,6 +142,69 @@ fn test_memorable_command_unknown_separator() {
 }
 
 #[test]
+fn test_memorable_command_json_output() {
+    let mut cmd = Command::cargo_bin("motus").unwrap();
+
+    // motus --seed 42 memorable
+    let output = cmd
+        .arg("--no-clipboard")
+        .arg("--seed")
+        .arg("42")
+        .arg("--output")
+        .arg("json")
+        .arg("memorable")
+        .output()
+        .expect("failed to execute process");
+
+    let json = String::from_utf8(output.stdout)
+        .expect("unable to parse json output; reason: invalid utf-8");
+
+    use assert_json::assert_json;
+
+    assert_json!(json.as_str(), {
+        "kind": "memorable",
+        "password": "chokehold nativity dolly ominous throat",
+    });
+}
+
+#[test]
+fn test_memorable_command_analyze_json_output() {
+    let mut cmd = Command::cargo_bin("motus").unwrap();
+
+    // motus --seed 42 memorable
+    let output = cmd
+        .arg("--no-clipboard")
+        .arg("--seed")
+        .arg("42")
+        .arg("--analyze")
+        .arg("--output")
+        .arg("json")
+        .arg("memorable")
+        .output()
+        .expect("failed to execute process");
+
+    let json = String::from_utf8(output.stdout)
+        .expect("unable to parse json output; reason: invalid utf-8");
+
+    use assert_json::assert_json;
+
+    assert_json!(json.as_str(), {
+        "kind": "memorable",
+        "password": "chokehold nativity dolly ominous throat",
+        "analysis": {
+            "strength": "very strong",
+            "guesses": "10^19",
+            "crack_times": {
+                "10/s": "centuries",
+                "100/h": "centuries",
+                "10^10/s": "57 years",
+                "10^4/s": "centuries"
+            },
+        },
+    });
+}
+
+#[test]
 fn test_random_command_default_behavior() {
     let mut cmd = Command::cargo_bin("motus").unwrap();
 
@@ -250,6 +313,69 @@ fn test_random_command_too_many_characters() {
 }
 
 #[test]
+fn test_random_command_json_output() {
+    let mut cmd = Command::cargo_bin("motus").unwrap();
+
+    // motus --seed 42 memorable
+    let output = cmd
+        .arg("--no-clipboard")
+        .arg("--seed")
+        .arg("42")
+        .arg("--output")
+        .arg("json")
+        .arg("random")
+        .output()
+        .expect("failed to execute process");
+
+    let json = String::from_utf8(output.stdout)
+        .expect("unable to parse json output; reason: invalid utf-8");
+
+    use assert_json::assert_json;
+
+    assert_json!(json.as_str(), {
+        "kind": "random",
+        "password": "mHYvjgQAKBHBIRYdpPAI",
+    });
+}
+
+#[test]
+fn test_random_command_analyze_json_output() {
+    let mut cmd = Command::cargo_bin("motus").unwrap();
+
+    // motus --seed 42 memorable
+    let output = cmd
+        .arg("--no-clipboard")
+        .arg("--seed")
+        .arg("42")
+        .arg("--analyze")
+        .arg("--output")
+        .arg("json")
+        .arg("random")
+        .output()
+        .expect("failed to execute process");
+
+    let json = String::from_utf8(output.stdout)
+        .expect("unable to parse json output; reason: invalid utf-8");
+
+    use assert_json::assert_json;
+
+    assert_json!(json.as_str(), {
+        "kind": "random",
+        "password": "mHYvjgQAKBHBIRYdpPAI",
+        "analysis": {
+            "strength": "very strong",
+            "guesses": "10^19",
+            "crack_times": {
+                "10/s": "centuries",
+                "100/h": "centuries",
+                "10^10/s": "57 years",
+                "10^4/s": "centuries"
+            },
+        },
+    });
+}
+
+#[test]
 fn test_pin_command_default_behavior() {
     let mut cmd = Command::cargo_bin("motus").unwrap();
 
@@ -307,4 +433,67 @@ fn test_pin_command_too_many_numbers() {
         .arg("13")
         .assert()
         .failure();
+}
+
+#[test]
+fn test_pin_command_json_output() {
+    let mut cmd = Command::cargo_bin("motus").unwrap();
+
+    // motus --seed 42 memorable
+    let output = cmd
+        .arg("--no-clipboard")
+        .arg("--seed")
+        .arg("42")
+        .arg("--output")
+        .arg("json")
+        .arg("pin")
+        .output()
+        .expect("failed to execute process");
+
+    let json = String::from_utf8(output.stdout)
+        .expect("unable to parse json output; reason: invalid utf-8");
+
+    use assert_json::assert_json;
+
+    assert_json!(json.as_str(), {
+        "kind": "pin",
+        "password": "5564047",
+    });
+}
+
+#[test]
+fn test_pin_command_analyze_json_output() {
+    let mut cmd = Command::cargo_bin("motus").unwrap();
+
+    // motus --seed 42 memorable
+    let output = cmd
+        .arg("--no-clipboard")
+        .arg("--seed")
+        .arg("42")
+        .arg("--analyze")
+        .arg("--output")
+        .arg("json")
+        .arg("pin")
+        .output()
+        .expect("failed to execute process");
+
+    let json = String::from_utf8(output.stdout)
+        .expect("unable to parse json output; reason: invalid utf-8");
+
+    use assert_json::assert_json;
+
+    assert_json!(json.as_str(), {
+        "kind": "pin",
+        "password": "5564047",
+        "analysis": {
+            "strength": "weak",
+            "guesses": "10^6",
+            "crack_times": {
+                "10/s": "20 hours",
+                "100/h": "9 months",
+                "10^10/s": "less than a second",
+                "10^4/s": "1 minute"
+            },
+        },
+    });
 }
