@@ -28,9 +28,10 @@ UDrZrJJTYElWeOFHZmfp
 - Generate **secure memorable passwords**: motus uses the [EFF's wordlist](https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases) to generate secure and memorable passwords
 - Generate **random passwords** with optional number and symbol inclusion
 - Generate **PINs** with customizable length
+- **Security analysis**: the `--analyze` option provides a security analysis of the generated password, ensuring optimal password strength.
 - **Sane defaults**
-- Flexible **customization** options
 - **Clipboard** integration for easy password usage
+- Flexible **customization** options
 
 ## Installation
 
@@ -94,6 +95,15 @@ Options:
       --no-clipboard
           Disable automatic copying of generated password to clipboard
 
+  -o, --output <OUTPUT>
+          Output the generated password in a specified format
+
+          [default: text]
+          [possible values: text, json]
+
+      --analyze
+          Display a safety analysis along the generated password
+
       --seed <SEED>
           Seed value for deterministic password generation (for testing purposes)
 
@@ -135,6 +145,38 @@ UDrZrJJTYElWeOFHZmfp
 # Or customize the size of the PIN
 > motus pin --numbers 9
 347751411
+
+# Generate a password and analyze its security
+> motus --analyze memorable
+╔═══════════════════════════════════════════════╗
+║ Generated Password                            ║
+╠═══════════════════════════════════════════════╣
+║ unchanged implicit idealize smugness attitude ║
+╚═══════════════════════════════════════════════╝
+
+╔════════════════════════╗
+║ Security Analysis      ║
+╠══════════╦═════════════╣
+║ Strength ║ very strong ║
+╠══════════╬═════════════╣
+║ Guesses  ║ 10^19       ║
+╚══════════╩═════════════╝
+
+╔═════════════════════════════════════╗
+║ Crack time estimations              ║
+╠═══════════════════════╦═════════════╣
+║ 100 attempts/hour     ║ centuries   ║
+╠═══════════════════════╬═════════════╣
+║ 10 attempts/second    ║ centuries   ║
+╠═══════════════════════╬═════════════╣
+║ 10^4 attempts/second  ║ centuries   ║
+╠═══════════════════════╬═════════════╣
+║ 10^10 attempts/second ║ 57 years    ║
+╚═══════════════════════╩═════════════╝
+
+# Generate a password and output the result in JSON format
+> motus --output json random
+{"kind": "memorable", "password": "6HdwMjKQPYE3scIBlCps&1Ir5R8lQ85eIVtF!fpUSD"}
 ```
 
 ## Contributing
@@ -147,4 +189,4 @@ motus is distributed under the [AGPL-3.0 license](https://github.com/oleiade/mot
 
 ## Why the name?
 
-motus used to be a tv game that I would call the ancestor of Wordle. Players had to guess words of a given size, and would pick up balls from a cup to decide how each round would move along. They would make that very distinct move to scramble the balls around every time, with a very distinct sound. When starting this project, I thought of the process of generating passwords as this comforting and satisfying act of diving into a huge cup full of numbered balls, and the childish feeling of it. This project is named in memory of Motus. 
+motus used to be a tv game that I would call the ancestor of Wordle. Players had to guess words of a given size, and would pick up balls from a cup to decide how each round would move along. They would make that very distinct move to scramble the balls around every time, with a very distinct sound. When starting this project, I thought of the process of generating passwords as this comforting and satisfying act of diving into a huge cup full of numbered balls, and the childish feeling of it. This project is named in memory of Motus.
