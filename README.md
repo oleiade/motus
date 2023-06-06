@@ -7,20 +7,13 @@
     <a href="https://github.com/oleiade/motus/actions/workflows/build.yml"><img src="https://github.com/oleiade/motus/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
 </p>
 
-Motus is a command-line application written in Rust that makes generating secure passwords a breeze.
+Motus is a command-line application that makes generating secure passwords a breeze.
 
 Inspired by the user experience of the 1Password password generator, motus focuses on providing a simple and elegant user interface with sane defaults and comprehensive options. By default, motus copies the generated password to your clipboard, making it even more convenient to use.
 
-```zsh
-> motus memorable
-fossil abreast overplant commute dish
-
-> motus random
-UDrZrJJTYElWeOFHZmfp
-
-> motus pin
-1234421
-```
+<p align="center">
+  <img src="static/motus-demo.gif" alt="motus demo" />
+</p>
 
 ## Features
 
@@ -145,36 +138,17 @@ UDrZrJJTYElWeOFHZmfp
 # Or customize the size of the PIN
 > motus pin --numbers 9
 347751411
+```
 
-# Generate a password and analyze its security
-> motus --analyze memorable
-╔═══════════════════════════════════════════════╗
-║ Generated Password                            ║
-╠═══════════════════════════════════════════════╣
-║ unchanged implicit idealize smugness attitude ║
-╚═══════════════════════════════════════════════╝
+### Miscelaneous
 
-╔════════════════════════╗
-║ Security Analysis      ║
-╠══════════╦═════════════╣
-║ Strength ║ very strong ║
-╠══════════╬═════════════╣
-║ Guesses  ║ 10^19       ║
-╚══════════╩═════════════╝
+#### Generate a password and analyze its security
 
-╔═════════════════════════════════════╗
-║ Crack time estimations              ║
-╠═══════════════════════╦═════════════╣
-║ 100 attempts/hour     ║ centuries   ║
-╠═══════════════════════╬═════════════╣
-║ 10 attempts/second    ║ centuries   ║
-╠═══════════════════════╬═════════════╣
-║ 10^4 attempts/second  ║ centuries   ║
-╠═══════════════════════╬═════════════╣
-║ 10^10 attempts/second ║ 57 years    ║
-╚═══════════════════════╩═════════════╝
+![motus --analyze](static/motus-demo-report.gif)
 
-# Generate a password and output the result in JSON format
+##### Generate a password and output the result in JSON format
+
+```bash
 > motus --output json random
 {"kind": "memorable", "password": "6HdwMjKQPYE3scIBlCps&1Ir5R8lQ85eIVtF!fpUSD"}
 ```
