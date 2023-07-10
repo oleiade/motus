@@ -1,8 +1,7 @@
-#![feature(iter_intersperse)]
-
 use std::sync::Arc;
 
 use clap::ValueEnum;
+use itertools::Itertools;
 use lazy_static::lazy_static;
 use rand::distributions::{Uniform, WeightedIndex};
 use rand::prelude::*;
@@ -55,6 +54,7 @@ lazy_static! {
 /// # Returns
 ///
 /// A `String` containing the generated memorable password
+#[allow(unstable_name_collisions)] // using itertools::intersperse_with until it is stabilized
 pub fn memorable_password<R: Rng>(
     rng: &mut R,
     word_count: usize,
