@@ -59,7 +59,7 @@ aarch64-apple-darwin:
 # Rule for creating a Debian package
 deb-%: check_deb
 	@echo "Building Debian package for $*"
-	cargo deb --no-build --target $* --output target/$*/$(PROJECT_NAME)-$(VERSION)-$*-$(DEB_ARCH_$*).deb
+	cargo deb --no-build -p cli --target $* --output target/$*/$(PROJECT_NAME)-$(VERSION)-$*-$(DEB_ARCH_$*).deb
 	mv target/$*/$(PROJECT_NAME)-$(VERSION)-$*-$(DEB_ARCH_$*).deb release/
 
 # Rule for cleaning build artifacts

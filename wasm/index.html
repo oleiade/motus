@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello wasm 👋</title>
+    <meta name="description" content="Hello wasm" />
+  </head>
+
+  <body>
+    <h1>Hello wasm 👋</h1>
+    <script type="module">
+      import init, {
+        memorable_password,
+        random_password,
+        pin_password,
+        Separator,
+      } from "./pkg/motus_wasm.js";
+      init().then(() => {
+        let separator = Separator.Underscore;
+
+        console.log(
+          `memorable_password: ${memorable_password(4, separator, true, false)}`
+        );
+
+        console.log(`random password: ${random_password(16, true, true)}`);
+
+        console.log(`pin: ${pin_password(4)}`);
+      });
+    </script>
+  </body>
+</html>

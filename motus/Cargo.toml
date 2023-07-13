@@ -1,0 +1,18 @@
+[package]
+authors = ["Théo Crevon <theo@crevon.me>"]
+categories = ["command-line-utilities"]
+description = "A simple and secure password generation library"
+edition = "2021"
+homepage = "https://github.com/oleiade/motus/motus"
+keywords = ["security", "password", "generator"]
+license-file = "LICENSE"
+name = "motus"
+readme = "README.md"
+repository = "https://github.com/oleiade/motus"
+version = "0.2.0"
+
+[dependencies]
+clap = {version = "4.3.11", features = ["derive"]}
+itertools = "0.11.0"
+lazy_static = "1.4.0"
+rand = "0.8.5"
