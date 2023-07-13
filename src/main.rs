@@ -1,5 +1,3 @@
-#![feature(iter_intersperse)]
-
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 
