@@ -3,10 +3,14 @@ debug = true
 incremental = true
 lto = "off"
 
-[workspace]
 
+[workspace]
 members = [
-  "motus",
-  "cli",
-  "wasm",
+    "crates/*",
 ]
+resolver = "2"
+
+[workspace.dependencies]
+motus = { path = "crates/motus" }
+cli = { path = "crates/cli" }
+wasm = { path = "crates/wasm" }

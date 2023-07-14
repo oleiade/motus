@@ -1,7 +1,9 @@
 [package]
 edition = "2021"
 name = "wasm"
+description = "A WASM-compatible wrapper around the motus crate"
 version = "0.1.0"
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
