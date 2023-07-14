@@ -23,13 +23,19 @@ WINDOWS_TARGETS = x86_64-pc-windows-gnu \
 
 
 # Rule for building all targets
-release: linux macos
+release: linux macos wasm
 
 # Rule for building Linux targets, Debian, and RPM packages
 linux: check_cross check_linux_crosscompilation_on_macos $(LINUX_TARGETS) $(addprefix deb-, $(LINUX_TARGETS))
 
 # Rule for building macOS targets
 macos: check_cargo check_toolchain check_cross $(MACOS_TARGETS)
+
+# Rule for building wasm code
+wasm: check_wasm_pack
+	cd crates/motus-wasm && wasm-pack build --target web && cd -
+	mkdir -p release/wasm
+	cp -r crates/motus-wasm/pkg/* release/wasm/
 
 # Rules for building Linux targets and creating tar.gz archives
 $(LINUX_TARGETS):
@@ -87,6 +93,10 @@ check_deb:
 check_mingw:
 	@command -v x86_64-w64-mingw32-gcc > /dev/null 2>&1 || { echo >&2 "Error: 'mingw-w64' is not installed. Please install it according to your platform (macOS: 'brew install mingw-w64', Debian/Ubuntu: 'sudo apt-get install mingw-w64', Fedora: 'sudo dnf install mingw64-gcc')."; exit 1; }
 
+# Rule to check if 'wasm-pack' is installed
+check_wasm_pack:
+	@command -v wasm-pack > /dev/null 2>&1 || { echo >&2 "Error: 'wasm-pack' is not installed. Please install it by running 'cargo install wasm-pack'."; exit 1; }
+
 # Verify Homebrew tap and formula for cross-compiling Linux targets on macOS
 check_linux_crosscompilation_on_macos:
 ifeq ($(shell uname),Darwin)
@@ -104,4 +114,4 @@ ifeq ($(shell uname),Darwin)
 	fi
 endif
 
-.PHONY: check_cross check_cargo check_toolchain check_deb check_rpm linux windows macos release $(LINUX_TARGETS) $(WINDOWS_TARGETS) $(MACOS_TARGETS) deb rpm
+.PHONY: check_cross check_cargo check_toolchain check_deb check_rpm linux windows macos release $(LINUX_TARGETS) $(WINDOWS_TARGETS) $(MACOS_TARGETS) wasm deb rpm
