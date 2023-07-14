@@ -1,8 +1,12 @@
 [package]
 edition = "2021"
-name = "wasm"
-description = "A WASM-compatible wrapper around the motus crate"
-version = "0.1.0"
+name = "motus-wasm"
+description = "A dead-simple secure password generator WASM library"
+version = "0.2.0"
+homepage = "https://github.com/oleiade/motus"
+repository = "https://github.com/oleiade/motus"
+keywords = ["password", "generator", "wasm", "rust"]
+license-file = "../LICENSE"
 publish = false
 
 [lib]
