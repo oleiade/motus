@@ -270,7 +270,7 @@ mod tests {
     #[test]
     fn test_memorable_password() {
         let seed = 42; // Fixed seed for predictable randomness
-        let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+        let mut rng = StdRng::seed_from_u64(seed);
 
         let password = memorable_password(&mut rng, 4, Separator::Space, false, false);
         assert_eq!(password, "choking natural dolly ominous");
@@ -352,7 +352,7 @@ mod tests {
     #[test]
     fn test_get_random_words() {
         let seed = 42; // Fixed seed for predictable randomness
-        let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+        let mut rng = StdRng::seed_from_u64(seed);
 
         let words = get_random_words(&mut rng, 5);
 

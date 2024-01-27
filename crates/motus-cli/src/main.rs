@@ -110,7 +110,7 @@ fn main() {
     // Otherwise, use the main thread's randomness source
     let mut rng: Box<dyn RngCore> = match opts.seed {
         Some(seed) => Box::new(StdRng::seed_from_u64(seed)),
-        None => Box::new(rand::thread_rng()),
+        None => Box::new(thread_rng()),
     };
 
     let password = match opts.command {
