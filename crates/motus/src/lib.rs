@@ -200,7 +200,7 @@ pub fn random_password<R: Rng>(
         (false, false) => vec![10],
     };
 
-    let dist_set = WeightedIndex::new(&weights).expect("weights should be valid");
+    let dist_set = WeightedIndex::new(weights).expect("weights should be valid");
     let mut password = String::with_capacity(characters as usize);
 
     for _ in 0..characters {
