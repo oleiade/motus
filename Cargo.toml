@@ -13,5 +13,4 @@ resolver = "2"
 [workspace.dependencies]
 motus = { path = "crates/motus" }
 cli = { path = "crates/motus-cli" }
-tests = { path = "crates/motus-tests" }
 wasm = { path = "crates/motus-wasm" }
