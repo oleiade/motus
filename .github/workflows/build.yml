@@ -14,31 +14,41 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --verbose --all-features
 
-  fmt:
-    name: Rustfmt
+  rustfmt:
+    name: rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo fmt --all -- --check
+        with:
+          toolchain: stable
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: check formatting
+        run: cargo fmt --all -- --check
 
   clippy:
-    name: Clippy
+    name: clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo clippy --all --all-features -- -D warnings
+        with:
+          toolchain: stable
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: check
+        run: cargo clippy --workspace --all-features --all-targets -- -D warnings
 
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Build
         uses: dtolnay/rust-toolchain@nightly
       - name: Run tests
