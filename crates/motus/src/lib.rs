@@ -51,6 +51,11 @@ lazy_static! {
 /// println!("Generated password: {}", password);
 /// ```
 ///
+/// # Panics
+///
+/// The function may panic in the event a word from the list the crate embeds were to contain
+/// non-UTF-8 characters.
+///
 /// # Returns
 ///
 /// A `String` containing the generated memorable password
@@ -64,7 +69,7 @@ pub fn memorable_password<R: Rng>(
 ) -> String {
     // Get the random words and format them
     let formatted_words: Vec<String> = get_random_words(rng, word_count)
-        .iter()
+        .into_iter()
         .map(|word| {
             let mut word = word.to_string();
 
@@ -72,8 +77,7 @@ pub fn memorable_password<R: Rng>(
             if scramble {
                 let mut bytes = word.to_string().into_bytes();
                 bytes.shuffle(rng);
-                word =
-                    String::from_utf8(bytes.to_vec()).expect("random words should be valid UTF-8");
+                word = String::from_utf8(bytes).expect("random words should be valid UTF-8");
             }
 
             // Capitalize the word if requested
@@ -95,18 +99,18 @@ pub fn memorable_password<R: Rng>(
         Separator::Underscore => formatted_words.join("_"),
         Separator::Numbers => formatted_words
             .iter()
-            .map(|s| s.to_string())
+            .map(String::to_string)
             .intersperse_with(|| rng.gen_range(0..10).to_string())
             .collect(),
         Separator::NumbersAndSymbols => {
             let numbers_and_symbols: Vec<char> = SYMBOL_CHARS
                 .iter()
                 .chain(NUMBER_CHARS.iter())
-                .cloned()
+                .copied()
                 .collect();
             formatted_words
                 .iter()
-                .map(|s| s.to_string())
+                .map(String::to_string)
                 .intersperse_with(|| {
                     numbers_and_symbols
                         .choose(rng)
@@ -156,6 +160,10 @@ pub enum Separator {
 /// * `numbers: bool` - A flag indicating whether numbers should be included in the password
 /// * `symbols: bool` - A flag indicating whether symbols should be included in the password
 ///
+/// # Panics
+///
+/// The function may panic in the event that the provided `characters` argument is 0.
+///
 /// # Returns
 ///
 /// * `String` - The generated random password
@@ -193,8 +201,7 @@ pub fn random_password<R: Rng>(
 
         // If either numbers or symbols is true, but not the other, we want
         // to make sure that we apply the following distribution: 80% letters, 20% numbers.
-        (true, false) => vec![8, 2],
-        (false, true) => vec![8, 2],
+        (true, false) | (false, true) => vec![8, 2],
 
         // Otherwise we want to make sure that we apply the following distribution: 100% letters.
         (false, false) => vec![10],
@@ -260,7 +267,7 @@ const SYMBOL_CHARS: &[char] = &['!', '@', '#', '$', '%', '^', '&', '*', '(', ')'
 
 // get_random_words returns a vector of n random words from the word list
 fn get_random_words<R: Rng>(rng: &mut R, n: usize) -> Vec<&'static str> {
-    WORDS_LIST.choose_multiple(rng, n).cloned().collect()
+    WORDS_LIST.choose_multiple(rng, n).copied().collect()
 }
 
 #[cfg(test)]
