@@ -27,8 +27,8 @@ section = "main"
 arboard = "3.2.0"
 clap = "4.3.11"
 colored = "2.0.4"
-human-panic = "1.1.5"
-motus = {path = "../motus"}
+human-panic = "1.2.3"
+motus = { path = "../motus" }
 rand = "0.8.5"
 serde = "1.0.171"
 serde_json = "1.0.100"
