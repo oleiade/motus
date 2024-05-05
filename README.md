@@ -44,7 +44,7 @@ Add the repository and install motus:
 ```bash
 # Download and install the repository's GPG key
 curl -fsSL https://oleiade.github.io/deb/oleiade-archive-keyring.gpg | \
-gpg --dearmor \
+gpg --dearmor | \
 sudo tee /usr/share/keyrings/oleiade-archive-keyring.gpg > /dev/null
 
 # Add the repository to your system's sources
