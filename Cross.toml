@@ -1,0 +1,8 @@
+[target.x86_64-unknown-linux-gnu]
+image = "rustembedded/cross:x86_64-unknown-linux-gnu"
+
+[target.x86_64-unknown-linux-gnu.env]
+passthrough = [
+    "RUST_BACKTRACE",
+    "RUST_LOG",
+] 

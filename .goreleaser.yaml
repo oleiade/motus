@@ -1,74 +1,70 @@
 version: 2
 
 builds:
-  # You can have multiple builds defined as a yaml list
-  - #
-    # ID of the build.
-    #
-    # Default: Project directory name.
-    # id: "motus"
-
-    # Use rust.
+  # Mac build - uses native macOS cargo
+  - id: "motus-macos"
     builder: rust
-
-    # Binary name.
-    # Can be a path (e.g. `bin/app`) to wrap the binary in a directory.
-    #
-    # Default: Project directory name.
-    # binary: program
-
-    # List of targets to be built, in Rust's format.
-    # Default: [ "x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-gnu", "aarch64-unknown-linux-gnu", "aarch64-apple-darwin" ]
+    binary: motus
     targets:
-      # - x86_64-apple-darwin
-      # - x86_64-pc-windows-gnu
-      - aarch64-apple-darwin
-
-    # Path to project's (sub)directory containing the code.
-    # This is the working directory for the cargo build command(s).
-    #
-    # Default: '.'.
-    dir: '.'
-
-    # Set a specific cargo binary to use when building.
-    # It is safe to ignore this option in most cases.
-    #
-    # Default: "cargo".
-    # Templates: allowed.
-    tool: "cross"
-
-    # Sets the command to run to build.
-    # Can be useful if you want to build tests, for example,
-    # in which case you can set this to "test".
-    # It is safe to ignore this option in most cases.
-    #
-    # Default: zigbuild.
+      - aarch64-apple-darwin # Native target for Apple Silicon
+    dir: "."
+    tool: "cargo"
     command: build
+    flags:
+      - --release
+      - -p=cli
 
-    # Custom flags.
-    #
-    # Templates: allowed.
-    # Default: "--release".
-    # flags:
-    #   - --release
-    #   - -p=subproject # when using cargo-workspaces
+  # Linux build - uses cross for cross-compilation via Docker
+  - id: "motus-linux"
+    builder: rust
+    binary: motus
+    targets:
+      - x86_64-unknown-linux-gnu
+    dir: "."
+    tool: "cross" # Use cross instead of cargo
+    command: build
+    flags:
+      - --release
+      - -p=cli
+    env:
+      - CARGO_NET_GIT_FETCH_WITH_CLI=true # Helps with git authentication in Docker
 
-    # Custom environment variables to be set during the builds.
-    # Invalid environment variables will be ignored.
-    #
-    # Default: os.Environ() ++ env config section.
-    # Templates: allowed.
-    # env:
-    #   - FOO=bar
+# macOS specific configuration for archives
+archives:
+  - id: motus-archives
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: darwin
+        format: zip
+      - goos: linux
+        format: tar.gz
+    files:
+      - LICENSE
+      - README.md
 
-    # Hooks can be used to customize the final binary,
-    # for example, to run generators.
-    #
-    # Templates: allowed.
-    # hooks:
-    #   pre: ./foo.sh
-    #   post: ./script.sh {{ .Path }}
+# Linux package configuration (DEB)
+nfpms:
+  - id: motus-packages
+    package_name: motus
+    file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Arch }}"
 
-    # If true, skip the build.
-    # Useful for library projects.
-    # skip: false
+    vendor: Théo Crevon
+    homepage: https://github.com/oleiade/motus
+    maintainer: Théo Crevon <theo@crevon.me>
+    description: A simple and elegant password generator
+    license: MIT
+
+    section: utils
+    priority: optional
+
+    contents:
+      - src: LICENSE
+        dst: /usr/share/doc/motus/LICENSE
+      - src: README.md
+        dst: /usr/share/doc/motus/README.md
+
+    # Generate only DEB packages for now
+    formats:
+      - apk
+      - deb
+      - rpm
