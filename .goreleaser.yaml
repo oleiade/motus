@@ -1,0 +1,74 @@
+version: 2
+
+builds:
+  # You can have multiple builds defined as a yaml list
+  - #
+    # ID of the build.
+    #
+    # Default: Project directory name.
+    # id: "motus"
+
+    # Use rust.
+    builder: rust
+
+    # Binary name.
+    # Can be a path (e.g. `bin/app`) to wrap the binary in a directory.
+    #
+    # Default: Project directory name.
+    # binary: program
+
+    # List of targets to be built, in Rust's format.
+    # Default: [ "x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-gnu", "aarch64-unknown-linux-gnu", "aarch64-apple-darwin" ]
+    targets:
+      # - x86_64-apple-darwin
+      # - x86_64-pc-windows-gnu
+      - aarch64-apple-darwin
+
+    # Path to project's (sub)directory containing the code.
+    # This is the working directory for the cargo build command(s).
+    #
+    # Default: '.'.
+    dir: '.'
+
+    # Set a specific cargo binary to use when building.
+    # It is safe to ignore this option in most cases.
+    #
+    # Default: "cargo".
+    # Templates: allowed.
+    tool: "cross"
+
+    # Sets the command to run to build.
+    # Can be useful if you want to build tests, for example,
+    # in which case you can set this to "test".
+    # It is safe to ignore this option in most cases.
+    #
+    # Default: zigbuild.
+    command: build
+
+    # Custom flags.
+    #
+    # Templates: allowed.
+    # Default: "--release".
+    # flags:
+    #   - --release
+    #   - -p=subproject # when using cargo-workspaces
+
+    # Custom environment variables to be set during the builds.
+    # Invalid environment variables will be ignored.
+    #
+    # Default: os.Environ() ++ env config section.
+    # Templates: allowed.
+    # env:
+    #   - FOO=bar
+
+    # Hooks can be used to customize the final binary,
+    # for example, to run generators.
+    #
+    # Templates: allowed.
+    # hooks:
+    #   pre: ./foo.sh
+    #   post: ./script.sh {{ .Path }}
+
+    # If true, skip the build.
+    # Useful for library projects.
+    # skip: false
