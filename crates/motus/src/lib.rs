@@ -311,9 +311,11 @@ mod tests {
         assert!(password_symbols.chars().any(|c| SYMBOL_CHARS.contains(&c)));
 
         let password_numbers_symbols = random_password(&mut rng, length, true, true);
-        assert!(password_numbers_symbols
-            .chars()
-            .any(|c| NUMBER_CHARS.contains(&c) || SYMBOL_CHARS.contains(&c)));
+        assert!(
+            password_numbers_symbols
+                .chars()
+                .any(|c| NUMBER_CHARS.contains(&c) || SYMBOL_CHARS.contains(&c))
+        );
     }
 
     #[test]

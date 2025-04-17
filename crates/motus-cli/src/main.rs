@@ -6,11 +6,11 @@ use clap::{Parser, Subcommand, ValueEnum};
 use colored::{ColoredString, Colorize};
 use human_panic::setup_panic;
 use rand::prelude::*;
-use serde::ser::{SerializeStruct, Serializer};
 use serde::Serialize;
+use serde::ser::{SerializeStruct, Serializer};
 use term_table::row::Row;
 use term_table::table_cell::{Alignment, TableCell};
-use term_table::{row, rows, Table, TableStyle};
+use term_table::{Table, TableStyle, row, rows};
 use zxcvbn::zxcvbn;
 
 /// Args is a struct representing the command line arguments
@@ -278,12 +278,16 @@ impl<'a> SecurityAnalysis<'a> {
             .max_column_width(max_width)
             .style(table_style)
             .rows(rows![
-                row![TableCell::builder("Generated Password".bold())
-                    .alignment(Alignment::Left)
-                    .build(),],
-                row![TableCell::builder(self.password)
-                    .alignment(Alignment::Left)
-                    .build(),]
+                row![
+                    TableCell::builder("Generated Password".bold())
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+                row![
+                    TableCell::builder(self.password)
+                        .alignment(Alignment::Left)
+                        .build(),
+                ]
             ])
             .build();
 
@@ -295,9 +299,11 @@ impl<'a> SecurityAnalysis<'a> {
             .max_column_width(max_width)
             .style(table_style)
             .rows(rows![
-                row![TableCell::builder("Security Analysis")
-                    .alignment(Alignment::Left)
-                    .build(),],
+                row![
+                    TableCell::builder("Security Analysis")
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
                 row![
                     TableCell::builder("Strength".bold())
                         .alignment(Alignment::Left)
@@ -327,9 +333,11 @@ impl<'a> SecurityAnalysis<'a> {
             .max_column_width(max_width)
             .style(table_style)
             .rows(rows![
-                row![TableCell::builder("Crack time estimations")
-                    .alignment(Alignment::Left)
-                    .build(),],
+                row![
+                    TableCell::builder("Crack time estimations")
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
                 row![
                     TableCell::builder("100 attempts/hour".bold())
                         .alignment(Alignment::Left)
