@@ -10,7 +10,7 @@ use serde::ser::{SerializeStruct, Serializer};
 use serde::Serialize;
 use term_table::row::Row;
 use term_table::table_cell::{Alignment, TableCell};
-use term_table::{Table, TableStyle, rows, row};
+use term_table::{row, rows, Table, TableStyle};
 use zxcvbn::zxcvbn;
 
 /// Args is a struct representing the command line arguments
@@ -278,16 +278,12 @@ impl<'a> SecurityAnalysis<'a> {
             .max_column_width(max_width)
             .style(table_style)
             .rows(rows![
-                row![
-                    TableCell::builder("Generated Password".bold())
-                        .alignment(Alignment::Left)
-                        .build(),
-                ],
-                row![
-                    TableCell::builder(self.password)
-                        .alignment(Alignment::Left)
-                        .build(),
-                ]
+                row![TableCell::builder("Generated Password".bold())
+                    .alignment(Alignment::Left)
+                    .build(),],
+                row![TableCell::builder(self.password)
+                    .alignment(Alignment::Left)
+                    .build(),]
             ])
             .build();
 
@@ -299,25 +295,23 @@ impl<'a> SecurityAnalysis<'a> {
             .max_column_width(max_width)
             .style(table_style)
             .rows(rows![
-                row![
-                    TableCell::builder("Security Analysis")
-                        .alignment(Alignment::Left)
-                        .build(),
-                ],
+                row![TableCell::builder("Security Analysis")
+                    .alignment(Alignment::Left)
+                    .build(),],
                 row![
                     TableCell::builder("Strength".bold())
                         .alignment(Alignment::Left)
                         .build(),
-
-                    TableCell::builder(PasswordStrength::from(self.entropy.score()).to_colored_string())
-                        .alignment(Alignment::Left)
-                        .build(),
+                    TableCell::builder(
+                        PasswordStrength::from(self.entropy.score()).to_colored_string()
+                    )
+                    .alignment(Alignment::Left)
+                    .build(),
                 ],
                 row![
                     TableCell::builder("Guesses".bold())
                         .alignment(Alignment::Left)
                         .build(),
-
                     TableCell::builder(format!("10^{:.0}", self.entropy.guesses_log10()))
                         .alignment(Alignment::Left)
                         .build(),
@@ -333,46 +327,60 @@ impl<'a> SecurityAnalysis<'a> {
             .max_column_width(max_width)
             .style(table_style)
             .rows(rows![
-                row![
-                    TableCell::builder("Crack time estimations")
-                        .alignment(Alignment::Left)
-                        .build(),
-                ],
+                row![TableCell::builder("Crack time estimations")
+                    .alignment(Alignment::Left)
+                    .build(),],
                 row![
                     TableCell::builder("100 attempts/hour".bold())
                         .alignment(Alignment::Left)
                         .build(),
-
-                    TableCell::builder(self.entropy.crack_times().online_throttling_100_per_hour().to_string())
-                        .alignment(Alignment::Left)
-                        .build(),
+                    TableCell::builder(
+                        self.entropy
+                            .crack_times()
+                            .online_throttling_100_per_hour()
+                            .to_string()
+                    )
+                    .alignment(Alignment::Left)
+                    .build(),
                 ],
                 row![
                     TableCell::builder("10 attempts/second".bold())
                         .alignment(Alignment::Left)
                         .build(),
-
-                    TableCell::builder(self.entropy.crack_times().online_no_throttling_10_per_second().to_string())
-                        .alignment(Alignment::Left)
-                        .build(),
+                    TableCell::builder(
+                        self.entropy
+                            .crack_times()
+                            .online_no_throttling_10_per_second()
+                            .to_string()
+                    )
+                    .alignment(Alignment::Left)
+                    .build(),
                 ],
                 row![
                     TableCell::builder("10^4 attempts/second".bold())
                         .alignment(Alignment::Left)
                         .build(),
-
-                    TableCell::builder(self.entropy.crack_times().offline_slow_hashing_1e4_per_second().to_string())
-                        .alignment(Alignment::Left)
-                        .build(),
+                    TableCell::builder(
+                        self.entropy
+                            .crack_times()
+                            .offline_slow_hashing_1e4_per_second()
+                            .to_string()
+                    )
+                    .alignment(Alignment::Left)
+                    .build(),
                 ],
                 row![
                     TableCell::builder("10^10 attempts/second".bold())
                         .alignment(Alignment::Left)
                         .build(),
-
-                    TableCell::builder(self.entropy.crack_times().offline_fast_hashing_1e10_per_second().to_string())
-                        .alignment(Alignment::Left)
-                        .build(),
+                    TableCell::builder(
+                        self.entropy
+                            .crack_times()
+                            .offline_fast_hashing_1e10_per_second()
+                            .to_string()
+                    )
+                    .alignment(Alignment::Left)
+                    .build(),
                 ],
             ])
             .build();
