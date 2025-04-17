@@ -10,7 +10,7 @@ use serde::ser::{SerializeStruct, Serializer};
 use serde::Serialize;
 use term_table::row::Row;
 use term_table::table_cell::{Alignment, TableCell};
-use term_table::{Table, TableStyle};
+use term_table::{Table, TableStyle, rows, row};
 use zxcvbn::zxcvbn;
 
 /// Args is a struct representing the command line arguments
@@ -274,117 +274,108 @@ impl<'a> SecurityAnalysis<'a> {
     }
 
     fn display_password_table(&self, table_style: TableStyle, max_width: usize) {
-        let mut table = Table::new();
-        table.max_column_width = max_width;
-        table.style = table_style;
-
-        table.add_row(Row::new(vec![TableCell::new_with_alignment(
-            "Generated Password".bold(),
-            1,
-            Alignment::Left,
-        )]));
-
-        table.add_row(Row::new(vec![TableCell::new(self.password)]));
+        let table = Table::builder()
+            .max_column_width(max_width)
+            .style(table_style)
+            .rows(rows![
+                row![
+                    TableCell::builder("Generated Password".bold())
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+                row![
+                    TableCell::builder(self.password)
+                        .alignment(Alignment::Left)
+                        .build(),
+                ]
+            ])
+            .build();
 
         println!("{}", table.render());
     }
 
     fn display_analysis_table(&self, table_style: TableStyle, max_width: usize) {
-        let mut table = Table::new();
-        table.max_column_width = max_width;
-        table.style = table_style;
+        let table = Table::builder()
+            .max_column_width(max_width)
+            .style(table_style)
+            .rows(rows![
+                row![
+                    TableCell::builder("Security Analysis")
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+                row![
+                    TableCell::builder("Strength".bold())
+                        .alignment(Alignment::Left)
+                        .build(),
 
-        table.add_row(Row::new(vec![TableCell::new_with_alignment(
-            "Security Analysis",
-            2,
-            Alignment::Left,
-        )]));
+                    TableCell::builder(PasswordStrength::from(self.entropy.score()).to_colored_string())
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+                row![
+                    TableCell::builder("Guesses".bold())
+                        .alignment(Alignment::Left)
+                        .build(),
 
-        table.add_row(Row::new(vec![
-            TableCell::new("Strength".bold()),
-            TableCell::new_with_alignment(
-                PasswordStrength::from(self.entropy.score()).to_colored_string(),
-                1,
-                Alignment::Left,
-            ),
-        ]));
-
-        table.add_row(Row::new(vec![
-            TableCell::new("Guesses".bold()),
-            TableCell::new_with_alignment(
-                format!("10^{:.0}", self.entropy.guesses_log10()),
-                1,
-                Alignment::Left,
-            ),
-        ]));
+                    TableCell::builder(format!("10^{:.0}", self.entropy.guesses_log10()))
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+            ])
+            .build();
 
         println!("{}", table.render());
     }
 
     fn display_crack_times_table(&self, table_style: TableStyle, max_width: usize) {
-        let mut table = Table::new();
-        table.max_column_width = max_width;
-        table.style = table_style;
+        let table = Table::builder()
+            .max_column_width(max_width)
+            .style(table_style)
+            .rows(rows![
+                row![
+                    TableCell::builder("Crack time estimations")
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+                row![
+                    TableCell::builder("100 attempts/hour".bold())
+                        .alignment(Alignment::Left)
+                        .build(),
 
-        table.add_row(Row::new(vec![TableCell::new_with_alignment(
-            "Crack time estimations",
-            2,
-            Alignment::Left,
-        )]));
+                    TableCell::builder(self.entropy.crack_times().online_throttling_100_per_hour().to_string())
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+                row![
+                    TableCell::builder("10 attempts/second".bold())
+                        .alignment(Alignment::Left)
+                        .build(),
 
-        table.add_row(Row::new(vec![
-            TableCell::new("100 attempts/hour".bold()),
-            TableCell::new_with_alignment(
-                format!(
-                    "{}",
-                    self.entropy.crack_times().online_throttling_100_per_hour()
-                ),
-                1,
-                Alignment::Left,
-            ),
-        ]));
+                    TableCell::builder(self.entropy.crack_times().online_no_throttling_10_per_second().to_string())
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+                row![
+                    TableCell::builder("10^4 attempts/second".bold())
+                        .alignment(Alignment::Left)
+                        .build(),
 
-        table.add_row(Row::new(vec![
-            TableCell::new("10 attempts/second".bold()),
-            TableCell::new_with_alignment(
-                format!(
-                    "{}",
-                    self.entropy
-                        .crack_times()
-                        .online_no_throttling_10_per_second()
-                ),
-                1,
-                Alignment::Left,
-            ),
-        ]));
+                    TableCell::builder(self.entropy.crack_times().offline_slow_hashing_1e4_per_second().to_string())
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+                row![
+                    TableCell::builder("10^10 attempts/second".bold())
+                        .alignment(Alignment::Left)
+                        .build(),
 
-        table.add_row(Row::new(vec![
-            TableCell::new("10^4 attempts/second".bold()),
-            TableCell::new_with_alignment(
-                format!(
-                    "{}",
-                    self.entropy
-                        .crack_times()
-                        .offline_slow_hashing_1e4_per_second()
-                ),
-                1,
-                Alignment::Left,
-            ),
-        ]));
-
-        table.add_row(Row::new(vec![
-            TableCell::new("10^10 attempts/second".bold()),
-            TableCell::new_with_alignment(
-                format!(
-                    "{}",
-                    self.entropy
-                        .crack_times()
-                        .offline_fast_hashing_1e10_per_second()
-                ),
-                1,
-                Alignment::Left,
-            ),
-        ]));
+                    TableCell::builder(self.entropy.crack_times().offline_fast_hashing_1e10_per_second().to_string())
+                        .alignment(Alignment::Left)
+                        .build(),
+                ],
+            ])
+            .build();
 
         println!("{}", table.render());
     }
