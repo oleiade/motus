@@ -13,7 +13,6 @@ version = "0.2.0"
 [dependencies]
 clap = {version = "4.3.11", features = ["derive"]}
 itertools = "0.11.0"
-lazy_static = "1.4.0"
 rand = "0.8.5"
 
 [lints.rust]

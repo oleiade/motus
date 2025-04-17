@@ -1,8 +1,7 @@
-use std::sync::Arc;
+use std::sync::LazyLock;
 
 use clap::ValueEnum;
 use itertools::Itertools;
-use lazy_static::lazy_static;
 use rand::distributions::{Uniform, WeightedIndex};
 use rand::prelude::*;
 
@@ -11,15 +10,12 @@ use rand::prelude::*;
 //
 // It is lazily initialized to avoid the cost of reading the wordlist from disk if it is not used
 // in a given run of the program.
-lazy_static! {
-    static ref WORDS_LIST: Arc<Vec<&'static str>> = {
-        let words = include_str!("../wordlist.txt")
-            .lines()
-            .filter(|l| l.len() >= 4)
-            .collect::<Vec<&str>>();
-        Arc::new(words)
-    };
-}
+static WORDS_LIST: LazyLock<Vec<&'static str>> = LazyLock::new(|| {
+    include_str!("../wordlist.txt")
+        .lines()
+        .filter(|l| l.len() >= 4)
+        .collect::<Vec<&str>>()
+});
 
 /// Generates a memorable password with the given options.
 ///
