@@ -1,5 +1,5 @@
 [package]
-edition = "2021"
+edition = "2024"
 name = "motus-wasm"
 description = "A dead-simple secure password generator WASM library"
 version = "0.2.0"

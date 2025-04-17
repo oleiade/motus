@@ -2,7 +2,7 @@
 authors = ["Théo Crevon <theo@crevon.me>"]
 categories = ["command-line-utilities"]
 description = "A simple and secure password generation library"
-edition = "2021"
+edition = "2024"
 homepage = "https://github.com/oleiade/motus/motus"
 keywords = ["security", "password", "generator"]
 license-file = "LICENSE"
