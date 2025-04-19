@@ -38,101 +38,101 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  publish-debian:
-    name: Publish Debian packages
-    runs-on: ubuntu-latest
-    needs: goreleaser
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # publish-debian:
+  #   name: Publish Debian packages
+  #   runs-on: ubuntu-latest
+  #   needs: goreleaser
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: goreleaser-artifacts
-          path: dist
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: goreleaser-artifacts
+  #         path: dist
 
-      - name: Set up GPG
-        run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
-          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
-          gpg-connect-agent reloadagent /bye
+  #     - name: Set up GPG
+  #       run: |
+  #         echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+  #         echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+  #         echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+  #         gpg-connect-agent reloadagent /bye
 
-      - name: Sign Debian packages
-        run: |
-          for pkg in dist/*.deb; do
-            dpkg-sig --sign builder -k "${{ secrets.GPG_KEY_ID }}" "$pkg"
-          done
-        env:
-          GNUPGHOME: ~/.gnupg
-          GPG_TTY: $(tty)
-          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+  #     - name: Sign Debian packages
+  #       run: |
+  #         for pkg in dist/*.deb; do
+  #           dpkg-sig --sign builder -k "${{ secrets.GPG_KEY_ID }}" "$pkg"
+  #         done
+  #       env:
+  #         GNUPGHOME: ~/.gnupg
+  #         GPG_TTY: $(tty)
+  #         PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.DEB_REPO_SSH_KEY }}
+  #     - name: Set up SSH
+  #       uses: webfactory/ssh-agent@v0.8.0
+  #       with:
+  #         ssh-private-key: ${{ secrets.DEB_REPO_SSH_KEY }}
 
-      - name: Install aptly
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y aptly
+  #     - name: Install aptly
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y aptly
 
-      - name: Setup aptly repository
-        run: |
-          mkdir -p ~/.aptly
-          cat > ~/.aptly/aptly.conf << EOF
-          {
-            "rootDir": "$HOME/.aptly",
-            "downloadConcurrency": 4,
-            "downloadSpeedLimit": 0,
-            "architectures": ["amd64", "arm64"],
-            "dependencyFollowSuggests": false,
-            "dependencyFollowRecommends": false,
-            "dependencyFollowAllVariants": false,
-            "dependencyFollowSource": false,
-            "dependencyVerboseResolve": false,
-            "gpgDisableSign": false,
-            "gpgDisableVerify": false,
-            "gpgProvider": "gpg",
-            "downloadSourcePackages": false,
-            "ppaDistributorID": "ubuntu",
-            "ppaCodename": "",
-            "skipLegacyPool": true,
-            "S3PublishEndpoints": {},
-            "SwiftPublishEndpoints": {}
-          }
-          EOF
+  #     - name: Setup aptly repository
+  #       run: |
+  #         mkdir -p ~/.aptly
+  #         cat > ~/.aptly/aptly.conf << EOF
+  #         {
+  #           "rootDir": "$HOME/.aptly",
+  #           "downloadConcurrency": 4,
+  #           "downloadSpeedLimit": 0,
+  #           "architectures": ["amd64", "arm64"],
+  #           "dependencyFollowSuggests": false,
+  #           "dependencyFollowRecommends": false,
+  #           "dependencyFollowAllVariants": false,
+  #           "dependencyFollowSource": false,
+  #           "dependencyVerboseResolve": false,
+  #           "gpgDisableSign": false,
+  #           "gpgDisableVerify": false,
+  #           "gpgProvider": "gpg",
+  #           "downloadSourcePackages": false,
+  #           "ppaDistributorID": "ubuntu",
+  #           "ppaCodename": "",
+  #           "skipLegacyPool": true,
+  #           "S3PublishEndpoints": {},
+  #           "SwiftPublishEndpoints": {}
+  #         }
+  #         EOF
 
-      - name: Upload to repository
-        run: |
-          # Get version from tag (without 'v' prefix)
-          VERSION=${GITHUB_REF#refs/tags/v}
+  #     - name: Upload to repository
+  #       run: |
+  #         # Get version from tag (without 'v' prefix)
+  #         VERSION=${GITHUB_REF#refs/tags/v}
           
-          # Create repository if it doesn't exist
-          aptly repo create -distribution=stable -component=main motus-repo || true
+  #         # Create repository if it doesn't exist
+  #         aptly repo create -distribution=stable -component=main motus-repo || true
           
-          # Add packages to repository
-          aptly repo add motus-repo dist/*.deb
+  #         # Add packages to repository
+  #         aptly repo add motus-repo dist/*.deb
           
-          # Create/update snapshot
-          aptly snapshot create motus-$VERSION from repo motus-repo
+  #         # Create/update snapshot
+  #         aptly snapshot create motus-$VERSION from repo motus-repo
           
-          # Publish snapshot (or switch if already published)
-          if aptly publish list | grep -q "motus-repo"; then
-            aptly publish switch stable motus-$VERSION
-          else
-            aptly publish snapshot -gpg-key="${{ secrets.GPG_KEY_ID }}" -distribution=stable motus-$VERSION
-          fi
+  #         # Publish snapshot (or switch if already published)
+  #         if aptly publish list | grep -q "motus-repo"; then
+  #           aptly publish switch stable motus-$VERSION
+  #         else
+  #           aptly publish snapshot -gpg-key="${{ secrets.GPG_KEY_ID }}" -distribution=stable motus-$VERSION
+  #         fi
           
-          # Sync published repository to GitHub Pages
-          rsync -avz --delete ~/.aptly/public/ ${{ secrets.DEB_REPO_SSH_USER }}@${{ secrets.DEB_REPO_SSH_HOST }}:${{ secrets.DEB_REPO_SSH_PATH }}/deb/
+  #         # Sync published repository to GitHub Pages
+  #         rsync -avz --delete ~/.aptly/public/ ${{ secrets.DEB_REPO_SSH_USER }}@${{ secrets.DEB_REPO_SSH_HOST }}:${{ secrets.DEB_REPO_SSH_PATH }}/deb/
 
-          # Also upload the archive keyring
-          gpg --armor --export ${{ secrets.GPG_KEY_ID }} > oleiade-archive-keyring.gpg
-          scp oleiade-archive-keyring.gpg ${{ secrets.DEB_REPO_SSH_USER }}@${{ secrets.DEB_REPO_SSH_HOST }}:${{ secrets.DEB_REPO_SSH_PATH }}/deb/
-        env:
-          GNUPGHOME: ~/.gnupg
-          GPG_TTY: $(tty)
-          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }} 
+  #         # Also upload the archive keyring
+  #         gpg --armor --export ${{ secrets.GPG_KEY_ID }} > oleiade-archive-keyring.gpg
+  #         scp oleiade-archive-keyring.gpg ${{ secrets.DEB_REPO_SSH_USER }}@${{ secrets.DEB_REPO_SSH_HOST }}:${{ secrets.DEB_REPO_SSH_PATH }}/deb/
+  #       env:
+  #         GNUPGHOME: ~/.gnupg
+  #         GPG_TTY: $(tty)
+  #         PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }} 

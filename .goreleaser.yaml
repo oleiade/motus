@@ -100,11 +100,10 @@ changelog:
 # Homebrew tap configuration
 brews:
   - name: motus
-    tap:
+    repository:
       owner: oleiade
       name: homebrew-tap
       token: "{{ .Env.GITHUB_TOKEN }}"
-    folder: Formula
     homepage: https://github.com/oleiade/motus
     description: A simple and elegant password generator
     license: MIT
