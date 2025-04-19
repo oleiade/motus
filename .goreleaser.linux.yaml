@@ -1,19 +1,6 @@
 version: 2
 
 builds:
-  # Mac build - uses native macOS cargo
-  - id: "motus-macos"
-    builder: rust
-    binary: motus
-    targets:
-      - aarch64-apple-darwin # Native target for Apple Silicon
-    dir: "."
-    tool: "cargo"
-    command: build
-    flags:
-      - --release
-      - -p=cli
-
   # Linux build - uses cross for cross-compilation via Docker
   - id: "motus-linux"
     builder: rust
@@ -29,13 +16,11 @@ builds:
     env:
       - CARGO_NET_GIT_FETCH_WITH_CLI=true # Helps with git authentication in Docker
 
-# macOS specific configuration for archives
+# Linux specific configuration for archives
 archives:
   - id: motus-archives
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
-      - goos: darwin
-        formats: ["zip"]
       - goos: linux
         formats: ["tar.gz"]
     files:
@@ -98,23 +83,23 @@ changelog:
       - Merge branch
 
 # Homebrew tap configuration
-brews:
-  - name: motus
-    repository:
-      owner: oleiade
-      name: homebrew-tap
-      token: "{{ .Env.GITHUB_TOKEN }}"
-    homepage: https://github.com/oleiade/motus
-    description: A simple and elegant password generator
-    license: MIT
-    test: |
-      system "#{bin}/motus --version"
-    install: |
-      bin.install "motus"
-    dependencies:
-      - name: rust
-        type: build
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+# brews:
+#   - name: motus
+#     repository:
+#       owner: oleiade
+#       name: homebrew-tap
+#       token: "{{ .Env.GITHUB_TOKEN }}"
+#     homepage: https://github.com/oleiade/motus
+#     description: A simple and elegant password generator
+#     license: MIT
+#     test: |
+#       system "#{bin}/motus --version"
+#     install: |
+#       bin.install "motus"
+#     dependencies:
+#       - name: rust
+#         type: build
+#     commit_author:
+#       name: goreleaserbot
+#       email: bot@goreleaser.com
+#     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"

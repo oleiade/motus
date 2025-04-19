@@ -1,0 +1,77 @@
+version: 2
+
+builds:
+  # Mac build - uses native macOS cargo
+  - id: "motus-macos"
+    builder: rust
+    binary: motus
+    targets:
+      - aarch64-apple-darwin # Native target for Apple Silicon
+    dir: "."
+    tool: "cargo"
+    command: build
+    flags:
+      - --release
+      - -p=cli
+
+# macOS specific configuration for archives
+archives:
+  - id: motus-archives
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: darwin
+        formats: ["zip"]
+    files:
+      - LICENSE
+      - README.md
+
+# Homebrew tap configuration
+# brews:
+#   - name: motus
+#     tap:
+#       owner: oleiade
+#       name: homebrew-tap
+#       token: "{{ .Env.GITHUB_TOKEN }}"
+#     folder: Formula
+#     homepage: https://github.com/oleiade/motus
+#     description: A simple and elegant password generator
+#     license: MIT
+#     test: |
+#       system "#{bin}/motus --version"
+#     install: |
+#       bin.install "motus"
+#     dependencies:
+#       - name: rust
+#         type: build
+#     commit_author:
+#       name: goreleaserbot
+#       email: bot@goreleaser.com
+#     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+
+# GitHub release configuration
+# release:
+#   github:
+#     owner: oleiade
+#     name: motus
+#   draft: true
+#   prerelease: auto
+#   mode: replace
+#   header: |
+#     # Motus {{ .Tag }} Release
+
+#     A simple and elegant password generator
+#   footer: |
+#     ## Installation
+
+#     * Binary downloads are available on the [releases page](https://github.com/oleiade/motus/releases).
+#     * Packages for various platforms are also available.
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - Merge pull request
+      - Merge branch
