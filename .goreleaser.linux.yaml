@@ -54,34 +54,6 @@ nfpms:
       - deb
       - rpm
 
-# GitHub release configuration
-release:
-  github:
-    owner: oleiade
-    name: motus
-  draft: true
-  prerelease: auto
-  mode: replace
-  header: |
-    # Motus {{ .Tag }} Release
-
-    A simple and elegant password generator
-  footer: |
-    ## Installation
-
-    * Binary downloads are available on the [releases page](https://github.com/oleiade/motus/releases).
-    * Packages for various platforms are also available.
-
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^ci:"
-      - Merge pull request
-      - Merge branch
-
 # Homebrew tap configuration
 # brews:
 #   - name: motus

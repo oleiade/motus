@@ -1,7 +1,7 @@
 version: 2
 
+# Mac build - uses native macOS cargo
 builds:
-  # Mac build - uses native macOS cargo
   - id: "motus-macos"
     builder: rust
     binary: motus
@@ -26,27 +26,27 @@ archives:
       - README.md
 
 # Homebrew tap configuration
-# brews:
-#   - name: motus
-#     tap:
-#       owner: oleiade
-#       name: homebrew-tap
-#       token: "{{ .Env.GITHUB_TOKEN }}"
-#     folder: Formula
-#     homepage: https://github.com/oleiade/motus
-#     description: A simple and elegant password generator
-#     license: MIT
-#     test: |
-#       system "#{bin}/motus --version"
-#     install: |
-#       bin.install "motus"
-#     dependencies:
-#       - name: rust
-#         type: build
-#     commit_author:
-#       name: goreleaserbot
-#       email: bot@goreleaser.com
-#     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+brews:
+  - name: motus
+    tap:
+      owner: oleiade
+      name: homebrew-tap
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    folder: Formula
+    homepage: https://github.com/oleiade/motus
+    description: A simple and elegant password generator
+    license: MIT
+    test: |
+      system "#{bin}/motus --version"
+    install: |
+      bin.install "motus"
+    dependencies:
+      - name: rust
+        type: build
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
 
 # GitHub release configuration
 # release:
@@ -58,20 +58,21 @@ archives:
 #   mode: replace
 #   header: |
 #     # Motus {{ .Tag }} Release
-
+#
 #     A simple and elegant password generator
 #   footer: |
 #     ## Installation
-
+#
 #     * Binary downloads are available on the [releases page](https://github.com/oleiade/motus/releases).
 #     * Packages for various platforms are also available.
 
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^ci:"
-      - Merge pull request
-      - Merge branch
+# Comment out the changelog configuration as well
+# changelog:
+#   sort: asc
+#   filters:
+#     exclude:
+#       - "^docs:"
+#       - "^test:"
+#       - "^ci:"
+#       - Merge pull request
+#       - Merge branch
