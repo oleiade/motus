@@ -6,39 +6,6 @@ on:
       - 'v*'
 
 jobs:
-  release-linux:
-    name: Release for Linux
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-
-      - name: Install cross
-        run: cargo install cross
-
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean --config=.goreleaser.linux.yaml --skip=publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-artifacts
-          path: dist/*
-          retention-days: 1
-
   release-macos:
     name: Release for macOS
     runs-on: macos-latest
@@ -61,63 +28,37 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean --config=.goreleaser.macos.yaml --skip=publish
+          args: release --clean --config=.goreleaser.macos.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-artifacts
-          path: dist/*
-          retention-days: 1
 
-  create-unified-release:
-    name: Create Unified GitHub Release
-    needs: [release-linux, release-macos]
+  release-linux:
+    name: Release for Linux
+    needs: [release-macos]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
-      - name: Download Linux artifacts
-        uses: actions/download-artifact@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          name: linux-artifacts
-          path: dist/linux
-          
-      - name: Download macOS artifacts
-        uses: actions/download-artifact@v4
+          toolchain: stable
+
+      - name: Install cross
+        run: cargo install cross
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         with:
-          name: macos-artifacts
-          path: dist/macos
-          
-      - name: Prepare unified release directory
-        run: |
-          mkdir -p dist/unified
-          cp -r dist/linux/* dist/unified/
-          cp -r dist/macos/* dist/unified/
-          
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: true
-          prerelease: false
-          files: dist/unified/*
-          name: Motus ${{ github.ref_name }} Release
-          body: |
-            # Motus ${{ github.ref_name }} Release
-            
-            A simple and elegant password generator
-            
-            ## Installation
-            
-            * Binary downloads are available on the [releases page](https://github.com/oleiade/motus/releases).
-            * Packages for various platforms are also available.
+          distribution: goreleaser
+          version: latest
+          args: release --clean --config=.goreleaser.linux.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # publish-debian:
   #   name: Publish Debian packages
   #   runs-on: ubuntu-latest

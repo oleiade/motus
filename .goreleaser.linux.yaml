@@ -54,6 +54,15 @@ nfpms:
       - deb
       - rpm
 
+# GitHub release configuration - Append to existing release
+release:
+  github:
+    owner: oleiade
+    name: motus
+  draft: true
+  prerelease: auto
+  mode: append
+
 # Homebrew tap configuration
 # brews:
 #   - name: motus
