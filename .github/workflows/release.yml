@@ -24,17 +24,6 @@ jobs:
       - name: Install cross
         run: cargo install cross
 
-      - name: Setup Docker for cross
-        run: |
-          # Install Docker Desktop for Mac
-          brew install --cask docker
-          # Wait for Docker to start
-          open -a Docker
-          # Give Docker some time to initialize
-          sleep 30
-          # Verify Docker is running
-          docker version || (echo "Docker failed to start" && exit 1)
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
