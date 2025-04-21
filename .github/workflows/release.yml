@@ -6,8 +6,8 @@ on:
       - 'v*'
 
 jobs:
-  release-macos:
-    name: Release for macOS
+  release:
+    name: Release
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -19,43 +19,28 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+          targets: x86_64-unknown-linux-gnu
 
       - name: Install cross
         run: cargo install cross
+
+      - name: Setup Docker for cross
+        run: |
+          # Install Docker Desktop for Mac
+          brew install --cask docker
+          # Wait for Docker to start
+          open -a Docker
+          # Give Docker some time to initialize
+          sleep 30
+          # Verify Docker is running
+          docker version || (echo "Docker failed to start" && exit 1)
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean --config=.goreleaser.macos.yaml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  release-linux:
-    name: Release for Linux
-    needs: [release-macos]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-
-      - name: Install cross
-        run: cargo install cross
-
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean --config=.goreleaser.linux.yaml
+          args: release --clean --config=.goreleaser.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
