@@ -15,14 +15,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install stable toolchain for x86 linux
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-          targets: x86_64-unknown-linux-gnu
+          target: x86_64-unknown-linux-gnu
 
-      - name: Install cross
-        run: cargo install cross
+      - name: Install stable toolchain for macOS
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: aarch64-apple-darwin
+
+      - name: Install cargo-zigbuild
+        run: cargo install --locked cargo-zigbuild
+
+      - name: Setup zig
+        uses: mlugg/setup-zig@v1
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
@@ -32,6 +41,7 @@ jobs:
           args: release --clean --config=.goreleaser.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPLOYMENT_ACCESS_TOKEN: ${{ secrets.DEPLOYMENT_ACCESS_TOKEN }}
 
   # publish-debian:
   #   name: Publish Debian packages

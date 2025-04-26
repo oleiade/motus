@@ -21,8 +21,7 @@ builds:
     targets:
       - x86_64-unknown-linux-gnu
     dir: "."
-    tool: "cross" # Using cross to handle cross-compilation
-    command: build
+    command: zigbuild
     flags:
       - --release
       - -p=cli
@@ -74,7 +73,8 @@ brews:
     repository:
       owner: oleiade
       name: homebrew-tap
-      token: "{{ .Env.GITHUB_TOKEN }}"
+      token: "{{ .Env.DEPLOYMENT_ACCESS_TOKEN }}"
+    directory: Formula
     homepage: https://github.com/oleiade/motus
     description: A simple and elegant password generator
     license: MIT
