@@ -4,9 +4,9 @@ on:
   schedule:
     - cron: "0 0 * * *"
   push:
-    paths:
-      - "**/Cargo.toml"
-      - "**/Cargo.lock"
+    branches: ["main"]
+  pull_request:
+    branches: ["**"]
 
 permissions: {}
       
@@ -18,6 +18,26 @@ jobs:
         with:
           persist-credentials: false
       
-      - uses: EmbarkStudios/cargo-deny-action@34899fc7ba81ca6268d5947a7a16b4649013fea1
+      - name: Look for Rust dependencies with security advisories (cargo-deny)
+        id: cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@34899fc7ba81ca6268d5947a7a16b4649013fea1
         with:
           command: check advisories
+
+  zizmor:
+    name: zizmor latest via PyPI
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@c7f87aa956e4c323abf06d5dec078e358f6b4d04 # v6.0.0
+
+      - name: Run zizmor 🌈
+        run: uvx --no-progress zizmor --persona auditor --format plain .
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
