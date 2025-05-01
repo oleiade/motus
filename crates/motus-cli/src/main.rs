@@ -6,6 +6,7 @@ use clap::{Parser, Subcommand, ValueEnum};
 use colored::{ColoredString, Colorize};
 use human_panic::setup_panic;
 use rand::prelude::*;
+use rand::rng as thread_rng;
 use serde::Serialize;
 use serde::ser::{SerializeStruct, Serializer};
 use term_table::row::Row;

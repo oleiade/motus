@@ -7,19 +7,19 @@ pub fn memorable_password(
     capitalize: bool,
     scramble: bool,
 ) -> String {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     motus::memorable_password(&mut rng, word_count, separator.into(), capitalize, scramble)
 }
 
 #[wasm_bindgen]
 pub fn random_password(characters: u32, numbers: bool, symbols: bool) -> String {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     motus::random_password(&mut rng, characters, numbers, symbols)
 }
 
 #[wasm_bindgen]
 pub fn pin_password(numbers: u32) -> String {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     motus::pin_password(&mut rng, numbers)
 }
 

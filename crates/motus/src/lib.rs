@@ -2,7 +2,8 @@ use std::sync::LazyLock;
 
 use clap::ValueEnum;
 use itertools::Itertools;
-use rand::distributions::{Uniform, WeightedIndex};
+use rand::distr::Uniform;
+use rand::distr::weighted::WeightedIndex;
 use rand::prelude::*;
 
 // WORDS_LIST is a list of words to use for generating memorable passwords, which
@@ -96,7 +97,7 @@ pub fn memorable_password<R: Rng>(
         Separator::Numbers => formatted_words
             .iter()
             .map(String::to_string)
-            .intersperse_with(|| rng.gen_range(0..10).to_string())
+            .intersperse_with(|| rng.random_range(0..10).to_string())
             .collect(),
         Separator::NumbersAndSymbols => {
             let numbers_and_symbols: Vec<char> = SYMBOL_CHARS
@@ -210,7 +211,8 @@ pub fn random_password<R: Rng>(
         let selected_set = available_sets
             .get(dist_set.sample(rng))
             .expect("index should be valid");
-        let dist_char = Uniform::from(0..selected_set.len());
+        let dist_char =
+            Uniform::new(0, selected_set.len()).expect("failed to create uniform distribution");
         let index = dist_char.sample(rng);
         password.push(selected_set[index]);
     }
@@ -244,7 +246,7 @@ pub fn random_password<R: Rng>(
 /// ```
 pub fn pin_password<R: Rng>(rng: &mut R, numbers: u32) -> String {
     (0..numbers)
-        .map(|_| NUMBER_CHARS[rng.gen_range(0..NUMBER_CHARS.len())])
+        .map(|_| NUMBER_CHARS[rng.random_range(0..NUMBER_CHARS.len())])
         .collect()
 }
 
@@ -285,7 +287,7 @@ mod tests {
         assert_eq!(password, "Violate-Applause-Preorder-Headstone");
 
         let password = memorable_password(&mut rng, 4, Separator::Numbers, true, true);
-        assert_eq!(password, "Nioutfna2Cerslua5Aborrcw4Wtpse");
+        assert_eq!(password, "Taunnfoi8Causerl9Ocrrwab5Stpwe");
     }
 
     #[test]

@@ -43,7 +43,7 @@ fn test_memorable_command_custom_separator() {
         .arg("numbers-and-symbols")
         .assert()
         .success()
-        .stdout("chokehold(nativity9dolly2ominous(throat\n");
+        .stdout("chokehold2nativity9dolly(ominous9throat\n");
 }
 
 #[test]
@@ -73,7 +73,7 @@ fn test_memorable_command_no_full_words() {
         .arg("--no-full-words")
         .assert()
         .success()
-        .stdout("lhodheokc inayittv loydl uoimson tohatr\n");
+        .stdout("edhhookcl tyaitniv dlloy mnosiuo htator\n");
 }
 
 #[test]
@@ -93,7 +93,7 @@ fn test_memorable_command_all_options() {
         .arg("--no-full-words")
         .assert()
         .success()
-        .stdout("Lhodheokc2Tnaevi)Loopld!Meno7Etvrhi$Uptgnne^Ozoyw\n");
+        .stdout("Lhkheoodc6Aivnte2Odopll#Mnoe)Thervi!Npetnug6Yzowo\n");
 }
 
 #[test]
@@ -185,6 +185,7 @@ fn test_memorable_command_analyze_json_output() {
 
     let json = String::from_utf8(output.stdout)
         .expect("unable to parse json output; reason: invalid utf-8");
+    println!("JSON: {}", json);
 
     use assert_json::assert_json;
 
@@ -215,7 +216,7 @@ fn test_random_command_default_behavior() {
         .arg("random")
         .assert()
         .success()
-        .stdout("mHYvjgQAKBHBIRYdpPAI\n");
+        .stdout("BCHvbvMSgaWAuhBlaBcH\n");
 }
 
 #[test]
@@ -231,7 +232,7 @@ fn test_random_command_specified_characters_count() {
         .arg("10")
         .assert()
         .success()
-        .stdout("mHYvjgQAKB\n");
+        .stdout("BCHvbvMSga\n");
 }
 
 #[test]
@@ -246,7 +247,7 @@ fn test_random_command_numbers() {
         .arg("--numbers")
         .assert()
         .success()
-        .stdout("mH9vj1Q57B6BIRYdpPAI\n");
+        .stdout("BC640vMSga9A3h52aBcH\n");
 }
 
 #[test]
@@ -261,7 +262,7 @@ fn test_random_command_symbols() {
         .arg("--symbols")
         .assert()
         .success()
-        .stdout("mH)vj@Q^*B&BIRYdpPAI\n");
+        .stdout("BC&%!vMSga)A$h^#aBcH\n");
 }
 
 #[test]
@@ -279,7 +280,7 @@ fn test_random_command_all_options() {
         .arg("--symbols")
         .assert()
         .success()
-        .stdout("mH)vj1Q^7B\n");
+        .stdout("BC6%!vMSga\n");
 }
 
 #[test]
@@ -334,7 +335,7 @@ fn test_random_command_json_output() {
 
     assert_json!(json.as_str(), {
         "kind": "random",
-        "password": "mHYvjgQAKBHBIRYdpPAI",
+        "password": "BCHvbvMSgaWAuhBlaBcH",
     });
 }
 
@@ -361,7 +362,7 @@ fn test_random_command_analyze_json_output() {
 
     assert_json!(json.as_str(), {
         "kind": "random",
-        "password": "mHYvjgQAKBHBIRYdpPAI",
+        "password": "BCHvbvMSgaWAuhBlaBcH",
         "analysis": {
             "strength": "very strong",
             "guesses": "10^19",
@@ -386,7 +387,7 @@ fn test_pin_command_default_behavior() {
         .arg("pin")
         .assert()
         .success()
-        .stdout("5564047\n");
+        .stdout("1525869\n");
 }
 
 #[test]
@@ -402,7 +403,7 @@ fn test_pin_command_numbers() {
         .arg("9")
         .assert()
         .success()
-        .stdout("556404781\n");
+        .stdout("152586949\n");
 }
 
 #[test]
@@ -457,7 +458,7 @@ fn test_pin_command_json_output() {
 
     assert_json!(json.as_str(), {
         "kind": "pin",
-        "password": "5564047",
+        "password": "1525869",
     });
 }
 
@@ -484,15 +485,15 @@ fn test_pin_command_analyze_json_output() {
 
     assert_json!(json.as_str(), {
         "kind": "pin",
-        "password": "5564047",
+        "password": "1525869",
         "analysis": {
-            "strength": "weak",
+            "strength": "reasonable",
             "guesses": "10^6",
             "crack_times": {
-                "10/s": "20 hours",
-                "100/h": "9 months",
+                "10/s": "1 day",
+                "100/h": "1 year",
                 "10^10/s": "less than a second",
-                "10^4/s": "1 minute"
+                "10^4/s": "2 minutes"
             },
         },
     });
