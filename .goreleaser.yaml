@@ -66,6 +66,7 @@ nfpms:
       - apk
       - deb
       - rpm
+      - archlinux
 
 # Homebrew tap configuration
 brews:
