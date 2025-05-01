@@ -2,7 +2,7 @@
 edition = "2024"
 name = "motus-wasm"
 description = "A dead-simple secure password generator WASM library"
-version = "0.2.0"
+version = "0.3.0"
 homepage = "https://github.com/oleiade/motus"
 repository = "https://github.com/oleiade/motus"
 keywords = ["password", "generator", "wasm", "rust"]
@@ -14,6 +14,6 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 getrandom = {version = "0.3.2", features = ["wasm_js"]}
-motus = {version = "0.2.0", path = "../motus"}
+motus = {version = "0.3.0", path = "../motus"}
 rand = "0.9.1"
 wasm-bindgen = "0.2.87"
