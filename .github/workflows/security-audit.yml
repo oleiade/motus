@@ -1,4 +1,4 @@
-name: security audit
+name: Security
 
 on:
   schedule:
@@ -7,11 +7,17 @@ on:
     paths:
       - "**/Cargo.toml"
       - "**/Cargo.lock"
+
+permissions: {}
+      
 jobs:
-  security_audit:
+  security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: EmbarkStudios/cargo-deny-action@v1
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      
+      - uses: EmbarkStudios/cargo-deny-action@34899fc7ba81ca6268d5947a7a16b4649013fea1
         with:
           command: check advisories
