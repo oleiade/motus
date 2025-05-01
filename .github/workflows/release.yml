@@ -5,13 +5,14 @@ on:
     tags:
       - 'v*'
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
   release:
     name: Release
     runs-on: macos-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
