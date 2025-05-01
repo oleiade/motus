@@ -116,6 +116,7 @@ pub fn memorable_password<R: Rng>(
                 })
                 .collect()
         }
+        Separator::None => formatted_words.join(""),
     }
 }
 
@@ -143,6 +144,7 @@ pub enum Separator {
     Underscore,
     Numbers,
     NumbersAndSymbols,
+    None,
 }
 
 /// Generates a random password with a specified length and optional inclusion of numbers and symbols.
@@ -288,6 +290,9 @@ mod tests {
 
         let password = memorable_password(&mut rng, 4, Separator::Numbers, true, true);
         assert_eq!(password, "Taunnfoi8Causerl9Ocrrwab5Stpwe");
+
+        let password = memorable_password(&mut rng, 4, Separator::None, false, false);
+        assert_eq!(password, "molecularthirstinggroundrubber");
     }
 
     #[test]
