@@ -17,7 +17,7 @@ use zxcvbn::zxcvbn;
 /// Args is a struct representing the command line arguments
 #[derive(Parser, Debug)]
 #[command(name = "motus")]
-#[command(version = "0.2.0")]
+#[command(version = "0.3.1")]
 #[command(about = "A command-line tool to generate secure passwords")]
 #[command(
     long_about = "Motus is a command-line tool for generating secure, random, and memorable passwords as well as PIN codes."

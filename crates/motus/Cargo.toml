@@ -8,7 +8,7 @@ keywords = ["security", "password", "generator"]
 license-file = "LICENSE"
 name = "motus"
 repository = "https://github.com/oleiade/motus"
-version = "0.3.0"
+version = "0.3.1"
 
 [dependencies]
 clap = {version = "4.3.11", features = ["derive"]}

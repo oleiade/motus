@@ -26,6 +26,13 @@ jobs:
           target: x86_64-unknown-linux-gnu
           cache: false
 
+      - name: Install stable toolchain for aarch64 linux
+        uses: actions-rust-lang/setup-rust-toolchain@9d7e65c320fdb52dcd45ffaa68deb6c02c8754d9
+        with:
+          toolchain: stable
+          target: aarch64-unknown-linux-gnu
+          cache: false
+
       - name: Install stable toolchain for macOS
         uses: actions-rust-lang/setup-rust-toolchain@9d7e65c320fdb52dcd45ffaa68deb6c02c8754d9
         with:
