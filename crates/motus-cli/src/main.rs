@@ -263,7 +263,7 @@ impl Serialize for SecurityAnalysis<'_> {
 
 impl<'a> SecurityAnalysis<'a> {
     fn new(password: &'a str) -> Self {
-        let entropy = zxcvbn(password, &[]).expect("unable to analyze password's safety");
+        let entropy = zxcvbn(password, &[]);
         Self { password, entropy }
     }
 
@@ -413,8 +413,16 @@ impl From<u8> for PasswordStrength {
             2 => PasswordStrength::Reasonable,
             3 => PasswordStrength::Strong,
             4 => PasswordStrength::VeryStrong,
-            _ => panic!("invalid score"),
+            _ => unreachable!("internal error: invalid password strength"),
         }
+    }
+}
+
+impl From<zxcvbn::Score> for PasswordStrength {
+    fn from(score: zxcvbn::Score) -> Self {
+        // Convert Score to u8 and then use the existing From<u8> implementation
+        let score_u8 = score as u8;
+        PasswordStrength::from(score_u8)
     }
 }
 
