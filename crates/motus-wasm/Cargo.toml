@@ -13,7 +13,7 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-getrandom = {version = "0.2.10", features = ["js"]}
+getrandom = {version = "0.3.2", features = ["wasm_js"]}
 motus = {version = "0.2.0", path = "../motus"}
 rand = "0.8.5"
 wasm-bindgen = "0.2.87"
