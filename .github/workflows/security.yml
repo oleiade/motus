@@ -11,10 +11,12 @@ on:
 permissions: {}
       
 jobs:
-  security:
+  cargo-deny:
+    name: Check for security advisories (cargo-deny)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout the code
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
       
