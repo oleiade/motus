@@ -140,7 +140,7 @@ UDrZrJJTYElWeOFHZmfp
 347751411
 ```
 
-### Miscelaneous
+### Miscellaneous
 
 #### Generate a password and analyze its security
 
