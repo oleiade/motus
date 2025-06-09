@@ -31,7 +31,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Lint with clippy
-        run: cargo clippy --workspace --all-features --all-targets -- -D warnings
+        run: cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
 
   build-and-test:
     name: Build & Test
@@ -48,7 +48,7 @@ jobs:
           toolchain: stable
 
       - name: Build the project
-        run: cargo build --all-features --release
+        run: cargo build --locked --all-features --release
 
       - name: Run tests
-        run: cargo test --all-features --release
+        run: cargo test --locked --all-features --release
