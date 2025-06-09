@@ -24,16 +24,16 @@ priority = "optional"
 section = "main"
 
 [dependencies]
-arboard = "3.2.0"
+arboard = { version = "3.2.0", default-features = false }
 clap = "4.3.11"
 colored = "3.0.0"
-human-panic = "2.0.2"
+human-panic = { version = "2.0.2", default-features = false }
 motus = { path = "../motus" }
-rand = "0.9.1"
-serde = "1.0.171"
+rand = { version = "0.9.1", default-features = false, features = [ "alloc", "thread_rng" ] }
+serde = { version = "1.0.171", default-features = false }
 serde_json = "1.0.100"
 term-table = "1.4.0"
-zxcvbn = "3.1.0"
+zxcvbn = { version = "3.1.0", default-features = false }
 
 [dev-dependencies]
 assert_cmd = "2.0.11"
