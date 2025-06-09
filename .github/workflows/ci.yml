@@ -10,6 +10,8 @@ permissions: {}
 
 env:
   CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0 # Disable incremental compilation for faster from-scratch builds
+  CARGO_PROFILE_TEST_DEBUG: 0 # Disable debug symbols for faster test builds
 
 jobs:
   format-and-lint:
