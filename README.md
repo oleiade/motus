@@ -63,8 +63,13 @@ apt install motus
 Alternatively, you can install using Cargo:
 
 ```bash
+# Install with clipboard support (default)
 cargo install motus
+
+# Install without clipboard support (for headless/server environments)
+cargo install motus --no-default-features
 ```
+
 
 ## Usage
 
@@ -157,13 +162,24 @@ UDrZrJJTYElWeOFHZmfp
 
 ### Clipboard Behavior
 
-In environments without X11/Wayland (such as SSH sessions, Docker containers, or headless servers), motus will generate passwords normally but cannot access the system clipboard. In these cases:
+For headless environments (SSH sessions, Docker containers, servers), you have two options:
+
+**Option 1: Compile without clipboard support (recommended for servers)**
+```bash
+# Install headless version with no clipboard dependencies
+cargo install motus --no-default-features
+
+# Use normally - no clipboard code or warnings
+motus memorable --words 5
+```
+
+**Option 2: Use runtime flag with standard version**
+In environments without X11/Wayland, the standard version will show warnings when clipboard access fails:
 
 - The password is still generated and displayed
 - A warning message is shown on stderr explaining the clipboard failure
 - Use `--no-clipboard` to suppress the warning for automated scripts
 
-**Example for SSH/headless environments:**
 ```bash
 # Suppress clipboard warnings for server usage
 motus --no-clipboard memorable --words 5

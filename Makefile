@@ -25,11 +25,20 @@ WINDOWS_TARGETS = x86_64-pc-windows-gnu \
 # Rule for building all targets
 release: linux macos wasm
 
+# Rule for building all headless targets (without clipboard)
+release-headless: linux-headless macos-headless
+
 # Rule for building Linux targets, Debian, and RPM packages
 linux: check_cross check_linux_crosscompilation_on_macos $(LINUX_TARGETS) $(addprefix deb-, $(LINUX_TARGETS))
 
+# Rule for building Linux targets without clipboard support
+linux-headless: check_cross check_linux_crosscompilation_on_macos $(addprefix headless-, $(LINUX_TARGETS))
+
 # Rule for building macOS targets
 macos: check_cargo check_toolchain check_cross $(MACOS_TARGETS)
+
+# Rule for building macOS targets without clipboard support
+macos-headless: check_cargo check_toolchain check_cross $(addprefix headless-, $(MACOS_TARGETS))
 
 # Rule for building wasm code
 wasm: check_wasm_pack
@@ -71,6 +80,36 @@ aarch64-apple-darwin:
 	mkdir -p release/$@
 	cp target/$@/release/motus release/$@/
 	tar czf release/motus-$@.tar.gz -C release/$@ motus
+
+# Rules for building headless Linux targets (no clipboard support)
+headless-x86_64-unknown-linux-gnu:
+	@echo "building headless for target x86_64-unknown-linux-gnu"
+	CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-unknown-linux-gnu-gcc cross build --target x86_64-unknown-linux-gnu --release --no-default-features
+	mkdir -p release/headless-x86_64-unknown-linux-gnu
+	cp target/x86_64-unknown-linux-gnu/release/motus release/headless-x86_64-unknown-linux-gnu/
+	tar czf release/motus-headless-x86_64-unknown-linux-gnu.tar.gz -C release/headless-x86_64-unknown-linux-gnu motus
+
+headless-aarch64-unknown-linux-gnu:
+	@echo "building headless for target aarch64-unknown-linux-gnu"
+	cross build --target aarch64-unknown-linux-gnu --release --no-default-features
+	mkdir -p release/headless-aarch64-unknown-linux-gnu
+	cp target/aarch64-unknown-linux-gnu/release/motus release/headless-aarch64-unknown-linux-gnu/
+	tar czf release/motus-headless-aarch64-unknown-linux-gnu.tar.gz -C release/headless-aarch64-unknown-linux-gnu motus
+
+# Rules for building headless macOS targets (no clipboard support)
+headless-x86_64-apple-darwin:
+	@echo "building headless for target x86_64-apple-darwin"
+	cross build --target x86_64-apple-darwin --release --no-default-features
+	mkdir -p release/headless-x86_64-apple-darwin
+	cp target/x86_64-apple-darwin/release/motus release/headless-x86_64-apple-darwin/
+	tar czf release/motus-headless-x86_64-apple-darwin.tar.gz -C release/headless-x86_64-apple-darwin motus
+
+headless-aarch64-apple-darwin:
+	@echo "building headless for target aarch64-apple-darwin"
+	cargo build --target aarch64-apple-darwin --release --no-default-features
+	mkdir -p release/headless-aarch64-apple-darwin
+	cp target/aarch64-apple-darwin/release/motus release/headless-aarch64-apple-darwin/
+	tar czf release/motus-headless-aarch64-apple-darwin.tar.gz -C release/headless-aarch64-apple-darwin motus
 
 # Rule for creating a Debian package
 deb-%: check_deb
@@ -124,4 +163,4 @@ ifeq ($(shell uname),Darwin)
 	fi
 endif
 
-.PHONY: check_cross check_cargo check_toolchain check_deb check_rpm linux windows macos release $(LINUX_TARGETS) $(WINDOWS_TARGETS) $(MACOS_TARGETS) wasm deb rpm lint test ci-check
+.PHONY: check_cross check_cargo check_toolchain check_deb check_rpm linux windows macos release release-headless linux-headless macos-headless $(LINUX_TARGETS) $(WINDOWS_TARGETS) $(MACOS_TARGETS) $(addprefix headless-, $(LINUX_TARGETS)) $(addprefix headless-, $(MACOS_TARGETS)) wasm deb rpm
