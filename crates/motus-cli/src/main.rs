@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 
+#[cfg(feature = "clipboard")]
 use arboard::Clipboard;
 use clap::{Parser, Subcommand, ValueEnum};
 use colored::{ColoredString, Colorize};
@@ -27,6 +28,7 @@ struct Cli {
     command: Commands,
 
     /// Disable automatic copying of generated password to clipboard
+    #[cfg(feature = "clipboard")]
     #[arg(long)]
     no_clipboard: bool,
 
@@ -136,11 +138,15 @@ fn main() {
     };
 
     // Copy the password to the clipboard
-    if !opts.no_clipboard {
-        if let Err(e) = Clipboard::new().and_then(|mut clipboard| clipboard.set_text(&password)) {
-            eprintln!(
-                "Warning: Could not copy to clipboard: {e}. Use --no-clipboard to suppress this warning."
-            );
+    #[cfg(feature = "clipboard")]
+    {
+        if !opts.no_clipboard {
+            if let Err(e) = Clipboard::new().and_then(|mut clipboard| clipboard.set_text(&password))
+            {
+                eprintln!(
+                    "Warning: Could not copy to clipboard: {e}. Use --no-clipboard to suppress this warning."
+                );
+            }
         }
     }
 

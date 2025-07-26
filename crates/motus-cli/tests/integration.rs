@@ -1,14 +1,24 @@
 use assert_cmd::Command;
 
-#[test]
-fn test_memorable_command_default_behavior() {
+// Helper function to create a command with appropriate clipboard flags
+fn motus_command() -> Command {
     let mut cmd = Command::cargo_bin("motus").unwrap();
 
+    // Only add --no-clipboard if the clipboard feature is enabled
+    #[cfg(feature = "clipboard")]
+    cmd.arg("--no-clipboard");
+
+    cmd
+}
+
+#[test]
+fn test_memorable_command_default_behavior() {
+    let mut cmd = motus_command();
+
     // `motus --seed 42 memorable`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable")
         .assert()
         .success()
         .stdout("chokehold nativity dolly ominous throat\n");
@@ -16,15 +26,14 @@ fn test_memorable_command_default_behavior() {
 
 #[test]
 fn test_memorable_command_custom_word_count() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 memorable --words 7`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
-        .arg("--words")
-        .arg("7")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable");
+    cmd.arg("--words");
+    cmd.arg("7")
         .assert()
         .success()
         .stdout("chokehold native dollop omen thrive pungent woozy\n");
@@ -32,15 +41,14 @@ fn test_memorable_command_custom_word_count() {
 
 #[test]
 fn test_memorable_command_custom_separator() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 memorable --separator " "`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
-        .arg("--separator")
-        .arg("numbers-and-symbols")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable");
+    cmd.arg("--separator");
+    cmd.arg("numbers-and-symbols")
         .assert()
         .success()
         .stdout("chokehold2nativity9dolly(ominous9throat\n");
@@ -48,14 +56,13 @@ fn test_memorable_command_custom_separator() {
 
 #[test]
 fn test_memorable_command_capitalize() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 memorable --capitalize`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
-        .arg("--capitalize")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable");
+    cmd.arg("--capitalize")
         .assert()
         .success()
         .stdout("Chokehold Nativity Dolly Ominous Throat\n");
@@ -63,14 +70,13 @@ fn test_memorable_command_capitalize() {
 
 #[test]
 fn test_memorable_command_no_full_words() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 memorable --no-full-words`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
-        .arg("--no-full-words")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable");
+    cmd.arg("--no-full-words")
         .assert()
         .success()
         .stdout("edhhookcl tyaitniv dlloy mnosiuo htator\n");
@@ -78,19 +84,18 @@ fn test_memorable_command_no_full_words() {
 
 #[test]
 fn test_memorable_command_all_options() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 memorable --words 7 --separator numbers-and-symbols --capitalize --no-full-words`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
-        .arg("--words")
-        .arg("7")
-        .arg("--separator")
-        .arg("numbers-and-symbols")
-        .arg("--capitalize")
-        .arg("--no-full-words")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable");
+    cmd.arg("--words");
+    cmd.arg("7");
+    cmd.arg("--separator");
+    cmd.arg("numbers-and-symbols");
+    cmd.arg("--capitalize");
+    cmd.arg("--no-full-words")
         .assert()
         .success()
         .stdout("Lhkheoodc6Aivnte2Odopll#Mnoe)Thervi!Npetnug6Yzowo\n");
@@ -98,63 +103,52 @@ fn test_memorable_command_all_options() {
 
 #[test]
 fn test_memorable_command_too_little_words() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 memorable --words 2`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
-        .arg("--words")
-        .arg("2")
-        .assert()
-        .failure();
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable");
+    cmd.arg("--words");
+    cmd.arg("2").assert().failure();
 }
 
 #[test]
 fn test_memorable_command_too_many_words() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 memorable --words 16`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
-        .arg("--words")
-        .arg("16")
-        .assert()
-        .failure();
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable");
+    cmd.arg("--words");
+    cmd.arg("16").assert().failure();
 }
 
 #[test]
 fn test_memorable_command_unknown_separator() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 memorable --separator "foo"`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("memorable")
-        .arg("--separator")
-        .arg("foo")
-        .assert()
-        .failure();
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("memorable");
+    cmd.arg("--separator");
+    cmd.arg("foo").assert().failure();
 }
 
 #[test]
 fn test_memorable_command_json_output() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // motus --seed 42 memorable
-    let output = cmd
-        .arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("--output")
-        .arg("json")
-        .arg("memorable")
-        .output()
-        .expect("failed to execute process");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("--output");
+    cmd.arg("json");
+    cmd.arg("memorable");
+
+    let output = cmd.output().expect("failed to execute process");
 
     let json = String::from_utf8(output.stdout)
         .expect("unable to parse json output; reason: invalid utf-8");
@@ -169,19 +163,17 @@ fn test_memorable_command_json_output() {
 
 #[test]
 fn test_memorable_command_analyze_json_output() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // motus --seed 42 memorable
-    let output = cmd
-        .arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("--analyze")
-        .arg("--output")
-        .arg("json")
-        .arg("memorable")
-        .output()
-        .expect("failed to execute process");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("--analyze");
+    cmd.arg("--output");
+    cmd.arg("json");
+    cmd.arg("memorable");
+
+    let output = cmd.output().expect("failed to execute process");
 
     let json = String::from_utf8(output.stdout)
         .expect("unable to parse json output; reason: invalid utf-8");
@@ -207,13 +199,12 @@ fn test_memorable_command_analyze_json_output() {
 
 #[test]
 fn test_random_command_default_behavior() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 random`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("random")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("random")
         .assert()
         .success()
         .stdout("BCHvbvMSgaWAuhBlaBcH\n");
@@ -221,30 +212,25 @@ fn test_random_command_default_behavior() {
 
 #[test]
 fn test_random_command_specified_characters_count() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 random --characters 10`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("random")
-        .arg("--characters")
-        .arg("10")
-        .assert()
-        .success()
-        .stdout("BCHvbvMSga\n");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("random");
+    cmd.arg("--characters");
+    cmd.arg("10").assert().success().stdout("BCHvbvMSga\n");
 }
 
 #[test]
 fn test_random_command_numbers() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 random --numbers`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("random")
-        .arg("--numbers")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("random");
+    cmd.arg("--numbers")
         .assert()
         .success()
         .stdout("BC640vMSga9A3h52aBcH\n");
@@ -252,14 +238,13 @@ fn test_random_command_numbers() {
 
 #[test]
 fn test_random_command_symbols() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 random --symbols`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("random")
-        .arg("--symbols")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("random");
+    cmd.arg("--symbols")
         .assert()
         .success()
         .stdout("BC&%!vMSga)A$h^#aBcH\n");
@@ -267,17 +252,16 @@ fn test_random_command_symbols() {
 
 #[test]
 fn test_random_command_all_options() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 random --characters 10 --numbers --symbols`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("random")
-        .arg("--characters")
-        .arg("10")
-        .arg("--numbers")
-        .arg("--symbols")
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("random");
+    cmd.arg("--characters");
+    cmd.arg("10");
+    cmd.arg("--numbers");
+    cmd.arg("--symbols")
         .assert()
         .success()
         .stdout("BC6%!vMSga\n");
@@ -285,48 +269,40 @@ fn test_random_command_all_options() {
 
 #[test]
 fn test_random_command_too_little_characters() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 random --characters 2`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("random")
-        .arg("--characters")
-        .arg("2")
-        .assert()
-        .failure();
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("random");
+    cmd.arg("--characters");
+    cmd.arg("2").assert().failure();
 }
 
 #[test]
 fn test_random_command_too_many_characters() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 random --characters 101`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("random")
-        .arg("--characters")
-        .arg("101")
-        .assert()
-        .failure();
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("random");
+    cmd.arg("--characters");
+    cmd.arg("101").assert().failure();
 }
 
 #[test]
 fn test_random_command_json_output() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // motus --seed 42 memorable
-    let output = cmd
-        .arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("--output")
-        .arg("json")
-        .arg("random")
-        .output()
-        .expect("failed to execute process");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("--output");
+    cmd.arg("json");
+    cmd.arg("random");
+
+    let output = cmd.output().expect("failed to execute process");
 
     let json = String::from_utf8(output.stdout)
         .expect("unable to parse json output; reason: invalid utf-8");
@@ -341,19 +317,17 @@ fn test_random_command_json_output() {
 
 #[test]
 fn test_random_command_analyze_json_output() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // motus --seed 42 memorable
-    let output = cmd
-        .arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("--analyze")
-        .arg("--output")
-        .arg("json")
-        .arg("random")
-        .output()
-        .expect("failed to execute process");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("--analyze");
+    cmd.arg("--output");
+    cmd.arg("json");
+    cmd.arg("random");
+
+    let output = cmd.output().expect("failed to execute process");
 
     let json = String::from_utf8(output.stdout)
         .expect("unable to parse json output; reason: invalid utf-8");
@@ -378,78 +352,62 @@ fn test_random_command_analyze_json_output() {
 
 #[test]
 fn test_pin_command_default_behavior() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 pin`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("pin")
-        .assert()
-        .success()
-        .stdout("1525869\n");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("pin").assert().success().stdout("1525869\n");
 }
 
 #[test]
 fn test_pin_command_numbers() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 pin --numbers`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("pin")
-        .arg("--numbers")
-        .arg("9")
-        .assert()
-        .success()
-        .stdout("152586949\n");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("pin");
+    cmd.arg("--numbers");
+    cmd.arg("9").assert().success().stdout("152586949\n");
 }
 
 #[test]
 fn test_pin_command_too_little_numbers() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 pin --numbers 2`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("pin")
-        .arg("--numbers")
-        .arg("2")
-        .assert()
-        .failure();
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("pin");
+    cmd.arg("--numbers");
+    cmd.arg("2").assert().failure();
 }
 
 #[test]
 fn test_pin_command_too_many_numbers() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // `motus --seed 42 pin --numbers 9`
-    cmd.arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("pin")
-        .arg("--numbers")
-        .arg("13")
-        .assert()
-        .failure();
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("pin");
+    cmd.arg("--numbers");
+    cmd.arg("13").assert().failure();
 }
 
 #[test]
 fn test_pin_command_json_output() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // motus --seed 42 memorable
-    let output = cmd
-        .arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("--output")
-        .arg("json")
-        .arg("pin")
-        .output()
-        .expect("failed to execute process");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("--output");
+    cmd.arg("json");
+    cmd.arg("pin");
+
+    let output = cmd.output().expect("failed to execute process");
 
     let json = String::from_utf8(output.stdout)
         .expect("unable to parse json output; reason: invalid utf-8");
@@ -464,19 +422,17 @@ fn test_pin_command_json_output() {
 
 #[test]
 fn test_pin_command_analyze_json_output() {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = motus_command();
 
     // motus --seed 42 memorable
-    let output = cmd
-        .arg("--no-clipboard")
-        .arg("--seed")
-        .arg("42")
-        .arg("--analyze")
-        .arg("--output")
-        .arg("json")
-        .arg("pin")
-        .output()
-        .expect("failed to execute process");
+    cmd.arg("--seed");
+    cmd.arg("42");
+    cmd.arg("--analyze");
+    cmd.arg("--output");
+    cmd.arg("json");
+    cmd.arg("pin");
+
+    let output = cmd.output().expect("failed to execute process");
 
     let json = String::from_utf8(output.stdout)
         .expect("unable to parse json output; reason: invalid utf-8");

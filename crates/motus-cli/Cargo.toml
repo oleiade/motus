@@ -4,6 +4,10 @@ name = "cli"
 version = "0.3.1"
 publish = false
 
+[features]
+default = ["clipboard"]
+clipboard = ["dep:arboard"]
+
 [[bin]]
 name = "motus"
 path = "src/main.rs"
@@ -16,15 +20,15 @@ Motus is a command-line application written in Rust that makes generating secure
 Inspired by the user experience of the 1Password password generator, motus focuses on providing a simple
 and elegant user interface with sane defaults and comprehensive options.
 
-By default, motus copies the generated password to your clipboard, making it even more convenient
-to use.
+By default, motus copies the generated password to your clipboard (when compiled with clipboard support),
+making it even more convenient to use.
 """
 maintainer = "Théo Crevon <theo@crevon.me>"
 priority = "optional"
 section = "main"
 
 [dependencies]
-arboard = { version = "3.2.0", default-features = false }
+arboard = { version = "3.2.0", default-features = false, optional = true }
 clap = "4.3.11"
 colored = "3.0.0"
 human-panic = { version = "2.0.2", default-features = false }
