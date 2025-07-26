@@ -137,11 +137,9 @@ fn main() {
 
     // Copy the password to the clipboard
     if !opts.no_clipboard {
-        let mut clipboard =
-            Clipboard::new().expect("unable to interact with your system's clipboard");
-        clipboard
-            .set_text(&password)
-            .expect("unable to set clipboard contents");
+        if let Err(e) = Clipboard::new().and_then(|mut clipboard| clipboard.set_text(&password)) {
+            eprintln!("Warning: Could not copy to clipboard: {}. Use --no-clipboard to suppress this warning.", e);
+        }
     }
 
     match opts.output {
