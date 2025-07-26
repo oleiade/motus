@@ -153,6 +153,43 @@ UDrZrJJTYElWeOFHZmfp
 {"kind": "memorable", "password": "6HdwMjKQPYE3scIBlCps&1Ir5R8lQ85eIVtF!fpUSD"}
 ```
 
+## Headless and SSH Usage
+
+### Clipboard Behavior
+
+In environments without X11/Wayland (such as SSH sessions, Docker containers, or headless servers), motus will generate passwords normally but cannot access the system clipboard. In these cases:
+
+- The password is still generated and displayed
+- A warning message is shown on stderr explaining the clipboard failure
+- Use `--no-clipboard` to suppress the warning for automated scripts
+
+**Example for SSH/headless environments:**
+```bash
+# Suppress clipboard warnings for server usage
+motus --no-clipboard memorable --words 5
+```
+
+### Output Streams
+
+Motus follows Unix conventions for output streams:
+- **stdout**: Contains only the generated password (or JSON output)
+- **stderr**: Contains warnings and error messages
+
+This design ensures passwords can be reliably captured by scripts even when warnings occur.
+
+**Script usage example:**
+```bash
+#!/bin/bash
+# Capture password to variable, ignore clipboard warnings
+PASSWORD=$(motus memorable --words 4 2>/dev/null)
+
+# Or capture warnings separately for logging
+motus memorable --words 4 2>warnings.log | some-other-tool
+
+# Pipe password directly to other tools
+motus --no-clipboard random --characters 20 | pbcopy
+```
+
 ## Contributing
 
 We welcome contributions to the project. Feel free to submit issues, suggest new features, or create pull requests to help improve motus.
