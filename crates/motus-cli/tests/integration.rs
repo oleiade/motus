@@ -185,7 +185,7 @@ fn test_memorable_command_analyze_json_output() {
 
     let json = String::from_utf8(output.stdout)
         .expect("unable to parse json output; reason: invalid utf-8");
-    println!("JSON: {}", json);
+    println!("JSON: {json}");
 
     use assert_json::assert_json;
 

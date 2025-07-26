@@ -37,6 +37,16 @@ wasm: check_wasm_pack
 	mkdir -p release/wasm
 	cp -r crates/motus-wasm/pkg/* release/wasm/
 
+# Development and CI commands
+lint:
+	cargo fmt --all -- --check
+	cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
+
+test:
+	cargo test --locked --all-features --release
+
+ci-check: lint test
+
 # Rules for building Linux targets and creating tar.gz archives
 $(LINUX_TARGETS):
 	@echo "building for target $@"
@@ -114,4 +124,4 @@ ifeq ($(shell uname),Darwin)
 	fi
 endif
 
-.PHONY: check_cross check_cargo check_toolchain check_deb check_rpm linux windows macos release $(LINUX_TARGETS) $(WINDOWS_TARGETS) $(MACOS_TARGETS) wasm deb rpm
+.PHONY: check_cross check_cargo check_toolchain check_deb check_rpm linux windows macos release $(LINUX_TARGETS) $(WINDOWS_TARGETS) $(MACOS_TARGETS) wasm deb rpm lint test ci-check

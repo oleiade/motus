@@ -150,7 +150,7 @@ fn main() {
                 let analysis = SecurityAnalysis::new(&password);
                 analysis.display_report(TableStyle::extended(), 80)
             } else {
-                println!("{}", password);
+                println!("{password}");
             }
         }
         OutputFormat::Json => {
@@ -449,7 +449,7 @@ impl Display for PasswordStrength {
             PasswordStrength::VeryStrong => "very strong",
         };
 
-        write!(f, "{}", strength)
+        write!(f, "{strength}")
     }
 }
 
