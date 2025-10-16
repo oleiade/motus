@@ -26,20 +26,5 @@ jobs:
         with:
           command: check advisories
 
-  zizmor:
-    name: zizmor latest via PyPI
-    runs-on: ubuntu-latest
-    permissions: {}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@c7f87aa956e4c323abf06d5dec078e358f6b4d04 # v6.0.0
-
-      - name: Run zizmor 🌈
-        run: uvx --no-progress zizmor --persona auditor --format plain .
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+  call-zizmor-workflow:
+    uses: oleiade/ci/.github/workflows/zizmor.yml@main
