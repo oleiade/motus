@@ -78,10 +78,8 @@ pub fn memorable_password<R: Rng>(
             }
 
             // Capitalize the word if requested
-            if capitalize {
-                if let Some(first_letter) = word.get_mut(0..1) {
-                    first_letter.make_ascii_uppercase();
-                }
+            if capitalize && let Some(first_letter) = word.get_mut(0..1) {
+                first_letter.make_ascii_uppercase();
             }
             word
         })
