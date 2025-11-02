@@ -8,8 +8,9 @@ on:
   pull_request:
     branches: ["**"]
 
-permissions: {}
-      
+permissions:       
+  contents: read
+
 jobs:
   cargo-deny:
     name: Check for security advisories (cargo-deny)
