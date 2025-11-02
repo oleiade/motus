@@ -27,6 +27,3 @@ jobs:
         uses: EmbarkStudios/cargo-deny-action@34899fc7ba81ca6268d5947a7a16b4649013fea1
         with:
           command: check advisories
-
-  call-zizmor-workflow:
-    uses: oleiade/ci/.github/workflows/zizmor.yml@main
