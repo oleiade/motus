@@ -72,7 +72,7 @@ pub fn memorable_password<R: Rng>(
 
             // Scramble the word if requested
             if scramble {
-                let mut bytes = word.to_string().into_bytes();
+                let mut bytes = word.clone().into_bytes();
                 bytes.shuffle(rng);
                 word = String::from_utf8(bytes).expect("random words should be valid UTF-8");
             }
