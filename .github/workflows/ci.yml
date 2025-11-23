@@ -8,49 +8,7 @@ on:
 
 permissions: {}
 
-env:
-  CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: 0 # Disable incremental compilation for faster from-scratch builds
-  CARGO_PROFILE_TEST_DEBUG: 0 # Disable debug symbols for faster test builds
-
 jobs:
-  format-and-lint:
-    name: Formatting & Linting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Setup the Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@9d7e65c320fdb52dcd45ffaa68deb6c02c8754d9
-        with:
-          toolchain: stable
-          components: rustfmt, clippy
-      
-      - name: Check formatting
-        run: cargo fmt --all -- --check
-
-      - name: Lint with clippy
-        run: cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
-
-  build-and-test:
-    name: Build & Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Setup the Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@9d7e65c320fdb52dcd45ffaa68deb6c02c8754d9
-        with:
-          toolchain: stable
-
-      - name: Build the project
-        run: cargo build --locked --all-features --release
-
-      - name: Run tests
-        run: cargo test --locked --all-features --release
+  ci:
+    uses: oleiade/ci/.github/workflows/rust.yml@main
+    secrets: inherit
