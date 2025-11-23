@@ -2,7 +2,7 @@ use assert_cmd::Command;
 
 // Helper function to create a command with appropriate clipboard flags
 fn motus_command() -> Command {
-    let mut cmd = Command::cargo_bin("motus").unwrap();
+    let mut cmd = assert_cmd::cargo::cargo_bin_cmd!("motus");
 
     // Only add --no-clipboard if the clipboard feature is enabled
     #[cfg(feature = "clipboard")]
