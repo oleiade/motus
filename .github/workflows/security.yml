@@ -24,6 +24,6 @@ jobs:
       
       - name: Look for Rust dependencies with security advisories (cargo-deny)
         id: cargo-deny
-        uses: EmbarkStudios/cargo-deny-action@34899fc7ba81ca6268d5947a7a16b4649013fea1
+        uses: EmbarkStudios/cargo-deny-action@f2ba7abc2abebaf185c833c3961145a3c275caad
         with:
           command: check advisories
