@@ -50,7 +50,7 @@ jobs:
         run: cargo install --locked cargo-zigbuild
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552
+        uses: goreleaser/goreleaser-action@f3511a2bf5d6eb8da032c0ceecaa69d0dcd18623
         with:
           distribution: goreleaser
           version: latest
