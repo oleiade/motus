@@ -42,7 +42,7 @@ jobs:
           cache: false
 
       - name: Setup zig
-        uses: mlugg/setup-zig@d91b47d4ef18469068fc2384bf44503bf3c3fa6e
+        uses: mlugg/setup-zig@74650188d73cbf0d68104aaaebe699c3ae90512e
         with:
           use-cache: false
 
