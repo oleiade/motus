@@ -21,21 +21,21 @@ jobs:
           persist-credentials: false
 
       - name: Install stable toolchain for x86 linux
-        uses: actions-rust-lang/setup-rust-toolchain@ca4a6432af353637602348dec3df861ef02ed8a6
+        uses: actions-rust-lang/setup-rust-toolchain@b598bed351cb8d159adfaa2ea4989c797082620f
         with:
           toolchain: stable
           target: x86_64-unknown-linux-gnu
           cache: false
 
       - name: Install stable toolchain for aarch64 linux
-        uses: actions-rust-lang/setup-rust-toolchain@ca4a6432af353637602348dec3df861ef02ed8a6
+        uses: actions-rust-lang/setup-rust-toolchain@b598bed351cb8d159adfaa2ea4989c797082620f
         with:
           toolchain: stable
           target: aarch64-unknown-linux-gnu
           cache: false
 
       - name: Install stable toolchain for macOS
-        uses: actions-rust-lang/setup-rust-toolchain@ca4a6432af353637602348dec3df861ef02ed8a6
+        uses: actions-rust-lang/setup-rust-toolchain@b598bed351cb8d159adfaa2ea4989c797082620f
         with:
           toolchain: stable
           target: aarch64-apple-darwin
