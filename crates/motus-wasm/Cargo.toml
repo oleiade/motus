@@ -6,7 +6,7 @@ version = "0.3.1"
 homepage = "https://github.com/oleiade/motus"
 repository = "https://github.com/oleiade/motus"
 keywords = ["password", "generator", "wasm", "rust"]
-license-file = "../LICENSE"
+license = "AGPL-3.0-or-later"
 publish = false
 
 [lib]
