@@ -48,14 +48,14 @@ gpg --dearmor | \
 sudo tee /usr/share/keyrings/oleiade-archive-keyring.gpg > /dev/null
 
 # Add the repository to your system's sources
-echo "deb [signed-by=/usr/share/keyrings/oleiade-archive-keyring.gpg] https://oleiade.github.io/deb stable main" \
+echo "deb [signed-by=/usr/share/keyrings/oleiade-archive-keyring.gpg] https://oleiade.github.io/deb stable main" | \
 sudo tee /etc/apt/sources.list.d/oleiade.list > /dev/null
 
 # Update your sources
-apt update
+sudo apt update
 
 # Install motus
-apt install motus
+sudo apt install motus
 ```
 
 ### using Cargo
