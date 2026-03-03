@@ -13,7 +13,7 @@ version = "0.3.1"
 [dependencies]
 clap = { version = "4.3.11", features = ["derive"] }
 itertools = { version = "0.14.0", default-features = false }
-rand = { version = "0.9.1", default-features = false }
+rand = { version = "0.10.0", default-features = false }
 
 [lints.rust]
 unsafe_code = "forbid"
