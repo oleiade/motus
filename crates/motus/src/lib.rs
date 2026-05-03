@@ -35,10 +35,10 @@ static WORDS_LIST: LazyLock<Vec<&'static str>> = LazyLock::new(|| {
 /// # Example
 ///
 /// ```
-/// use rand::thread_rng;
+/// use rand::rng;
 /// use motus::{Separator, memorable_password};
 ///
-/// let rng = &mut thread_rng();
+/// let rng = &mut rng();
 /// let word_count = 3;
 /// let separator = Separator::Hyphen;
 /// let capitalize = true;
@@ -168,10 +168,10 @@ pub enum Separator {
 /// # Examples
 ///
 /// ```
-/// use rand::thread_rng;
+/// use rand::rng;
 /// use motus::random_password;
 ///
-/// let mut rng = thread_rng();
+/// let mut rng = rng();
 /// let password = random_password(&mut rng, 12, true, true);
 /// assert_eq!(password.len(), 12);
 /// ```
@@ -236,10 +236,10 @@ pub fn random_password<R: Rng>(
 /// # Examples
 ///
 /// ```
-/// use rand::thread_rng;
+/// use rand::rng;
 /// use motus::pin_password;
 ///
-/// let mut rng = thread_rng();
+/// let mut rng = rng();
 /// let pin = pin_password(&mut rng, 4);
 /// assert_eq!(pin.len(), 4);
 /// assert!(pin.chars().all(|c| c.is_digit(10)));
@@ -265,7 +265,7 @@ const SYMBOL_CHARS: &[char] = &['!', '@', '#', '$', '%', '^', '&', '*', '(', ')'
 
 // get_random_words returns a vector of n random words from the word list
 fn get_random_words<R: Rng>(rng: &mut R, n: usize) -> Vec<&'static str> {
-    WORDS_LIST.choose_multiple(rng, n).copied().collect()
+    WORDS_LIST.sample(rng, n).copied().collect()
 }
 
 #[cfg(test)]
