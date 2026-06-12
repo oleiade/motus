@@ -137,11 +137,12 @@ fn main() {
         Commands::Pin { numbers } => motus::pin_password(&mut rng, numbers),
     };
 
-    // Copy the password to the clipboard
+    // Copy the password to the clipboard, excluding it from OS clipboard
+    // history and cloud sync wherever the platform supports it.
     #[cfg(feature = "clipboard")]
     {
         if !opts.no_clipboard
-            && let Err(e) = Clipboard::new().and_then(|mut clipboard| clipboard.set_text(&password))
+            && let Err(e) = copy_to_clipboard(&password)
         {
             eprintln!(
                 "Warning: Could not copy to clipboard: {e}. Use --no-clipboard to suppress this warning."
@@ -175,6 +176,31 @@ fn main() {
             println!("{}", serde_json::to_string(&output).unwrap());
         }
     }
+}
+
+/// Copies the given text to the system clipboard.
+///
+/// Where the platform supports it, the entry is excluded from the OS clipboard
+/// history and cloud clipboard so a freshly generated password is not retained
+/// locally or synced to other devices after it has been used.
+#[cfg(feature = "clipboard")]
+fn copy_to_clipboard(text: &str) -> Result<(), arboard::Error> {
+    #[cfg(target_os = "macos")]
+    use arboard::SetExtApple;
+    #[cfg(target_os = "windows")]
+    use arboard::SetExtWindows;
+
+    let mut clipboard = Clipboard::new()?;
+    let set = clipboard.set();
+
+    // On Windows, `exclude_from_monitoring` also keeps the entry out of the
+    // cloud clipboard and the clipboard history list.
+    #[cfg(target_os = "windows")]
+    let set = set.exclude_from_monitoring();
+    #[cfg(target_os = "macos")]
+    let set = set.exclude_from_history();
+
+    set.text(text)
 }
 
 #[derive(ValueEnum, Clone, Debug)]
