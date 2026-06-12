@@ -40,9 +40,14 @@ struct Cli {
     #[arg(long)]
     analyze: bool,
 
-    /// Seed value for deterministic password generation (for testing purposes)
+    /// Seed value for deterministic password generation (for testing purposes).
+    ///
+    /// A seeded password is fully determined by this value and is therefore
+    /// predictable. This flag is compiled in only under the `insecure-seed`
+    /// feature (used by the test suite) and is absent from release builds.
+    #[cfg(feature = "insecure-seed")]
     #[arg(long)]
-    seed: Option<u64>, // Set the randomness source with an unsigned 64-bit integer for reproducible passwords
+    seed: Option<u64>,
 }
 
 #[derive(Debug, Subcommand)]
@@ -108,10 +113,17 @@ fn main() {
     // Parse command line arguments
     let opts: Cli = Cli::parse();
 
-    // Initialize the randomness source
-    // If a seed is provided, use it to seed the randomness source
-    // Otherwise, use the main thread's randomness source
-    let mut rng: Box<dyn Rng> = match opts.seed {
+    // Initialize the randomness source.
+    //
+    // Release builds always use the operating system's CSPRNG. The optional
+    // `insecure-seed` feature (enabled for the test suite only) allows seeding a
+    // deterministic generator so tests can assert on reproducible output.
+    #[cfg(feature = "insecure-seed")]
+    let seed = opts.seed;
+    #[cfg(not(feature = "insecure-seed"))]
+    let seed: Option<u64> = None;
+
+    let mut rng: Box<dyn Rng> = match seed {
         Some(seed) => Box::new(StdRng::seed_from_u64(seed)),
         None => Box::new(thread_rng()),
     };

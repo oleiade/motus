@@ -1,3 +1,8 @@
+// Every test here drives the binary with `--seed` to assert on deterministic
+// output, so the whole suite requires the `insecure-seed` feature. It is enabled
+// by the `--all-features` test invocation used in CI and the Makefile.
+#![cfg(feature = "insecure-seed")]
+
 use assert_cmd::Command;
 
 // Helper function to create a command with appropriate clipboard flags

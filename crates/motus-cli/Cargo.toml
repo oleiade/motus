@@ -8,6 +8,11 @@ publish = false
 [features]
 default = ["clipboard"]
 clipboard = ["dep:arboard"]
+# Enables the `--seed` flag for deterministic, reproducible password generation.
+# Seeded passwords are predictable and therefore insecure; this feature exists
+# only so the test suite can assert on fixed output and is intentionally left out
+# of release builds. The test target enables it via `--all-features`.
+insecure-seed = []
 
 [[bin]]
 name = "motus"

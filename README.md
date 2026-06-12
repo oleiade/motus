@@ -102,9 +102,6 @@ Options:
       --analyze
           Display a safety analysis along the generated password
 
-      --seed <SEED>
-          Seed value for deterministic password generation (for testing purposes)
-
   -h, --help
           Print help (see a summary with '-h')
 
