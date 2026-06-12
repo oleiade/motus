@@ -14,3 +14,6 @@ release/
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+
+# Per-user Claude Code settings
+.claude/settings.local.json
