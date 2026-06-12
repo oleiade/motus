@@ -10,5 +10,7 @@ permissions: {}
 
 jobs:
   ci:
-    uses: oleiade/ci/.github/workflows/rust.yml@main
-    secrets: inherit
+    # Pinned to a commit SHA so a change to oleiade/ci's main branch cannot alter
+    # this workflow. The reusable workflow only runs fmt/clippy/build/test and
+    # needs no secrets, so none are inherited.
+    uses: oleiade/ci/.github/workflows/rust.yml@0d528c4a5ae5d6f4b10ca1370386c422d8945fef # main
