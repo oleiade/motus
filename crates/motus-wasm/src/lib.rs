@@ -33,6 +33,7 @@ pub enum Separator {
     Underscore,
     Numbers,
     NumbersAndSymbols,
+    None,
 }
 
 #[allow(clippy::from_over_into)]
@@ -46,6 +47,7 @@ impl Into<motus::Separator> for Separator {
             Separator::Underscore => motus::Separator::Underscore,
             Separator::Numbers => motus::Separator::Numbers,
             Separator::NumbersAndSymbols => motus::Separator::NumbersAndSymbols,
+            Separator::None => motus::Separator::None,
         }
     }
 }
