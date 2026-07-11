@@ -35,7 +35,7 @@ section = "main"
 
 [dependencies]
 arboard = { version = "3.2.0", default-features = false, optional = true }
-clap = "4.3.11"
+clap = { version = "4.3.11", features = ["derive"] }
 colored = "3.0.0"
 human-panic = { version = "2.0.2", default-features = false }
 motus = { path = "../motus" }
