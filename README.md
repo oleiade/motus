@@ -58,6 +58,14 @@ sudo apt update
 sudo apt install motus
 ```
 
+### on NixOS
+
+Add motus to `configuration.nix`:
+
+```nix
+environment.systemPackages = [ pkgs.motus ];
+```
+
 ### using Cargo
 
 Alternatively, you can install using Cargo:
