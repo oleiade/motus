@@ -281,7 +281,7 @@ checksum = "3a822ea5bc7590f9d40f1ba12c0dc3c2760f3482c6984db1573ad11031420831"
 
 [[package]]
 name = "cli"
-version = "0.3.1"
+version = "0.5.0"
 dependencies = [
  "arboard",
  "assert_cmd",
@@ -622,7 +622,7 @@ dependencies = [
 
 [[package]]
 name = "motus"
-version = "0.3.1"
+version = "0.5.0"
 dependencies = [
  "clap",
  "itertools 0.14.0",
@@ -631,7 +631,7 @@ dependencies = [
 
 [[package]]
 name = "motus-wasm"
-version = "0.3.1"
+version = "0.5.0"
 dependencies = [
  "getrandom",
  "motus",

@@ -8,7 +8,7 @@ keywords = ["security", "password", "generator"]
 license = "AGPL-3.0-or-later"
 name = "motus"
 repository = "https://github.com/oleiade/motus"
-version = "0.3.1"
+version = "0.5.0"
 
 [dependencies]
 clap = { version = "4.3.11", features = ["derive"] }
