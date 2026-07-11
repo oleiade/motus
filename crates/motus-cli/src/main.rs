@@ -104,6 +104,17 @@ enum Commands {
         #[arg(short, long, default_value = "7", value_parser = validate_pin_length)]
         numbers: u32,
     },
+
+    /// Internal: hold the clipboard contents until they are pasted or a
+    /// timeout elapses.
+    ///
+    /// On Linux, the clipboard drops its contents when the process that set
+    /// them exits. `copy_to_clipboard` spawns this hidden subcommand as a
+    /// short-lived background holder; the password travels over stdin so it
+    /// never appears in the process arguments.
+    #[cfg(all(target_os = "linux", feature = "clipboard"))]
+    #[command(name = "hold-clipboard", hide = true)]
+    HoldClipboard,
 }
 
 fn main() {
@@ -112,6 +123,17 @@ fn main() {
 
     // Parse command line arguments
     let opts: Cli = Cli::parse();
+
+    // On Linux the clipboard is held by a detached child process (see
+    // copy_to_clipboard); this hidden subcommand is that child.
+    #[cfg(all(target_os = "linux", feature = "clipboard"))]
+    if matches!(opts.command, Commands::HoldClipboard) {
+        if let Err(e) = hold_clipboard() {
+            eprintln!("Error: failed to hold the clipboard: {e}");
+            std::process::exit(1);
+        }
+        return;
+    }
 
     // Initialize the randomness source.
     //
@@ -147,6 +169,8 @@ fn main() {
             symbols,
         } => motus::random_password(&mut rng, characters, numbers, symbols),
         Commands::Pin { numbers } => motus::pin_password(&mut rng, numbers),
+        #[cfg(all(target_os = "linux", feature = "clipboard"))]
+        Commands::HoldClipboard => unreachable!("handled right after argument parsing"),
     };
 
     // Copy the password to the clipboard, excluding it from OS clipboard
@@ -177,6 +201,10 @@ fn main() {
                     Commands::Memorable { .. } => PasswordKind::Memorable,
                     Commands::Random { .. } => PasswordKind::Random,
                     Commands::Pin { .. } => PasswordKind::Pin,
+                    #[cfg(all(target_os = "linux", feature = "clipboard"))]
+                    Commands::HoldClipboard => {
+                        unreachable!("handled right after argument parsing")
+                    }
                 },
                 password: &password,
                 analysis: if opts.analyze {
@@ -195,7 +223,7 @@ fn main() {
 /// Where the platform supports it, the entry is excluded from the OS clipboard
 /// history and cloud clipboard so a freshly generated password is not retained
 /// locally or synced to other devices after it has been used.
-#[cfg(feature = "clipboard")]
+#[cfg(all(feature = "clipboard", not(target_os = "linux")))]
 fn copy_to_clipboard(text: &str) -> Result<(), arboard::Error> {
     #[cfg(target_os = "macos")]
     use arboard::SetExtApple;
@@ -213,6 +241,67 @@ fn copy_to_clipboard(text: &str) -> Result<(), arboard::Error> {
     let set = set.exclude_from_history();
 
     set.text(text)
+}
+
+/// How long the detached holder process keeps the password on the clipboard
+/// before letting it clear.
+#[cfg(all(feature = "clipboard", target_os = "linux"))]
+const CLIPBOARD_HOLD_TTL: std::time::Duration = std::time::Duration::from_secs(120);
+
+/// Copies the given text to the system clipboard.
+///
+/// X11 and Wayland clipboards drop their contents when the process that set
+/// them exits, so the password is handed over stdin to a detached copy of
+/// this binary (the hidden `hold-clipboard` subcommand) that keeps it
+/// available until it is pasted or `CLIPBOARD_HOLD_TTL` elapses. Letting the
+/// holder exit at the deadline doubles as an automatic clipboard clear.
+#[cfg(all(feature = "clipboard", target_os = "linux"))]
+fn copy_to_clipboard(text: &str) -> Result<(), arboard::Error> {
+    if spawn_clipboard_holder(text).is_ok() {
+        return Ok(());
+    }
+
+    // Fallback: set the clipboard from this process. The contents survive
+    // only if a clipboard manager is running, which beats not copying at all.
+    Clipboard::new()?.set().text(text)
+}
+
+#[cfg(all(feature = "clipboard", target_os = "linux"))]
+fn spawn_clipboard_holder(text: &str) -> std::io::Result<()> {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+
+    let mut child = Command::new(std::env::current_exe()?)
+        .arg("hold-clipboard")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
+
+    child
+        .stdin
+        .take()
+        .expect("child stdin should be piped")
+        .write_all(text.as_bytes())
+}
+
+/// Entry point of the hidden `hold-clipboard` subcommand: reads the password
+/// from stdin and owns the clipboard until it is pasted or the TTL elapses.
+#[cfg(all(feature = "clipboard", target_os = "linux"))]
+fn hold_clipboard() -> Result<(), Box<dyn std::error::Error>> {
+    use std::io::Read;
+
+    use arboard::SetExtLinux;
+
+    let mut password = String::new();
+    std::io::stdin().read_to_string(&mut password)?;
+
+    let deadline = std::time::Instant::now() + CLIPBOARD_HOLD_TTL;
+    Clipboard::new()?
+        .set()
+        .wait_until(deadline)
+        .text(password)?;
+    Ok(())
 }
 
 #[derive(ValueEnum, Clone, Debug)]
