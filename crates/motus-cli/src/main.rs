@@ -501,7 +501,7 @@ impl Display for PasswordStrength {
 fn validate_word_count(s: &str) -> Result<u32, String> {
     match s.parse::<u32>() {
         Ok(n) if (3..16).contains(&n) => Ok(n),
-        Ok(_) => Err("The number of words must be between 4 and 15".to_string()),
+        Ok(_) => Err("The number of words must be between 3 and 15".to_string()),
         Err(_) => Err("The number of words must be an integer".to_string()),
     }
 }
