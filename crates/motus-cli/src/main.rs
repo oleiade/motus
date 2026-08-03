@@ -387,7 +387,7 @@ impl Serialize for SecurityAnalysis<'_> {
         )?;
         struct_serializer.serialize_field(
             "guesses",
-            format!("10^{:.0}", &self.entropy.guesses_log10()).as_str(),
+            format!("10^{:.0}", self.entropy.guesses_log10()).as_str(),
         )?;
         struct_serializer.serialize_field("crack_times", &crack_times)?;
         struct_serializer.end()
