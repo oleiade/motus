@@ -1,6 +1,11 @@
 [advisories]
 version = 2
-ignore = []
+ignore = [
+    # chrono is flagged unmaintained (informational, not a vulnerability). It is
+    # pulled in transitively by zxcvbn 3.1.1 (latest) and has no safe upgrade.
+    # Revisit once zxcvbn drops chrono or a replacement estimator is adopted.
+    { id = "RUSTSEC-2026-0543", reason = "unmaintained transitive dep of zxcvbn; no upgrade path" },
+]
 
 [licenses]
 version = 2
